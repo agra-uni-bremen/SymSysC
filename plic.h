@@ -1,7 +1,7 @@
 #pragma once
 
-#include <tlm_utils/simple_target_socket.h>
-#include <systemc>
+//#include <tlm_utils/simple_target_socket.h>
+//#include <systemc>
 
 #include "core/common/irq_if.h"
 #include "util/tlm_map.h"
@@ -11,7 +11,8 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 	static_assert(NumberInterrupts <= 4096, "out of bound");
 	static_assert(NumberCores <= 15360, "out of bound");
 
-	tlm_utils::simple_target_socket<PLIC> tsock;
+	//tlm_utils::simple_target_socket<PLIC> tsock;
+	sim_tlm_utils::simple_target_socket<PLIC> tsock;
 
 	std::array<external_interrupt_target*, NumberCores> target_harts{};
 
@@ -32,8 +33,8 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 	vp::map::LocalRouter router = {"PLIC"};
 
-	sc_core::sc_event e_run;
-	sc_core::sc_time clock_cycle;
+	//sc_core::sc_event e_run;
+	//sc_core::sc_time clock_cycle;
 
 	SC_HAS_PROCESS(PLIC);
 
@@ -182,8 +183,20 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 
 	void run() {
+		static Label position = INIT;
+		switch (position)
+		{
+			case HERE1:
+				goto HERE1;
+			
+		}
+		
 		while (true) {
-			sc_core::wait(e_run);
+			//sc_core::wait(e_run);
+			position = HERE1;
+			return; //somehow  return
+HERE1:		
+			
 
 			for (unsigned i=0; i<NumberCores; ++i) {
 				if (!hart_eip[i]) {
