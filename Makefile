@@ -1,10 +1,10 @@
 cc=g++
-flags=--std=c++11
-includes=./systemc-dist/include
+flags=--std=c++14
+includes=. #./systemc-dist/include
 
 
-all: main
+@phony all: main
 
-
+  
 main: main.cpp
-	$(cc) $(flags) -I $(includes) main.cpp 
+	$(cc) $(flags) -I $(includes) main.cpp -o main

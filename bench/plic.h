@@ -1,10 +1,12 @@
 #pragma once
 
-#include <tlm_utils/simple_target_socket.h>
-#include <systemc>
+//#include <tlm_utils/simple_target_socket.h>
+#include <sym/wrap.h>
+//#include <systemc>
 
-//#include "core/common/irq_if.h"
-//#include "util/tlm_map.h"
+#include "core/common/irq_if.h"
+#include "util/tlm_map.h"
+
 #include <stdint.h>
 
 template <unsigned NumberCores, unsigned NumberInterrupts, uint32_t MaxPriority>
@@ -13,7 +15,7 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 	static_assert(NumberCores <= 15360, "out of bound");
 
 	//tlm_utils::simple_target_socket<PLIC> tsock;
-	sim_tlm_utils::simple_target_socket<PLIC> tsock;
+	tlm_utils::simple_target_socket<PLIC> tsock;
 
 	std::array<external_interrupt_target*, NumberCores> target_harts{};
 
@@ -184,6 +186,7 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 
 	void run() {
+		/*
 		static Label position = INIT;
 		switch (position)
 		{
@@ -191,10 +194,11 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 				goto HERE1;
 			
 		}
+		*/
 		
 		while (true) {
 			//sc_core::wait(e_run);
-			position = HERE1;
+			//position = HERE1;
 			return; //somehow  return
 HERE1:		
 			

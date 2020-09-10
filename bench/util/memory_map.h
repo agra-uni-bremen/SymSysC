@@ -2,7 +2,9 @@
 
 #include <functional>
 #include <vector>
+#include <assert.h>
 #include "common.h"
+#include <sym/wrap.h>
 
 struct RegisterRange {
 	struct WriteInfo {
