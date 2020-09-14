@@ -8,14 +8,9 @@
 #include "tlm_gp.h"
 
 
-
-#define SC_HAS_PROCESS( shit ) ;
-
-
-
-
-#define SC_THREAD( fun ) threads.push_back(std::bind(this, fun))
+typedef void Thread(void);
+typedef void Process(void);
 
 std::vector<std::function<Transportfunction>> transports;
-std::vector<std::function<void(void)>> threads;
-std::vector<std::function<void(void)>> processes;
+std::vector<std::function<Thread>> threads;
+std::vector<std::function<Process>> processes;

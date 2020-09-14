@@ -3,6 +3,7 @@
 //#include <tlm_utils/simple_target_socket.h>
 #include <sim/simple_target_socket.h>
 #include <sim/wrap.h>
+#include <sim/sc_event.h>
 #include "core/common/irq_if.h"
 #include "util/tlm_map.h"
 
@@ -34,10 +35,12 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 	vp::map::LocalRouter router = {"PLIC"};
 
-	//sc_core::sc_event e_run;
-	//sc_core::sc_time clock_cycle;
+	sc_core::sc_event e_run;
+	sc_core::sc_time clock_cycle;
 
 	SC_HAS_PROCESS(PLIC);
+	// macro-replaced to
+	//typedef PLIC SC_CURRENT_USER_MODULE;
 
 	PLIC(sc_core::sc_module_name nem) : sc_module(nem){
 		clock_cycle = sc_core::sc_time(10, sc_core::SC_NS);
@@ -67,6 +70,8 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 		}
 
 		SC_THREAD(run);
+		//Macro-replaced to
+		//threads.push_back(std::bind(&SC_CURRENT_USER_MODULE::run, this));
 	}
 
 
