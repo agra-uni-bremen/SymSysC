@@ -1,10 +1,13 @@
-cc=g++
-flags=--std=c++14
-includes=. #./systemc-dist/include
+
+@phony all: bench
 
 
-@phony all: main
-
+build/Makefile:
+	mkdir build || true
+	cd build && cmake ..
   
-main: main.cpp
-	$(cc) $(flags) -I $(includes) main.cpp -o main
+bench: build/Makefile
+	make -C build -j5
+	
+@phony clean:
+	rm -r build/

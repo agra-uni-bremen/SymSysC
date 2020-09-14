@@ -1,9 +1,7 @@
 #pragma once
 
-//#include <tlm_utils/simple_target_socket.h>
-#include <sim/simple_target_socket.h>
-#include <sim/wrap.h>
-#include <sim/sc_event.h>
+#include <tlm_utils/simple_target_socket.h>
+#include <systemc>
 #include "core/common/irq_if.h"
 #include "util/tlm_map.h"
 

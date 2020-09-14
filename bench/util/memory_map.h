@@ -4,7 +4,7 @@
 #include <vector>
 #include <assert.h>
 
-#include "../../sim/wrap.h"
+#include <systemc>
 #include "common.h"
 
 struct RegisterRange {

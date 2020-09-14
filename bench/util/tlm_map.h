@@ -6,7 +6,7 @@
 #include <functional>
 #include <unordered_map>
 #include <string.h>
-#include "../../sim/wrap.h"
+#include <systemc>
 
 /*
  * Optional modelling layer to simplify TLM register and memory access.

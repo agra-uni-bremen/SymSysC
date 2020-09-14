@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "bench/plic.h"
-#include "sim/wrap.h"
+#include "sim/systemc.h"
 
 
 int main()
