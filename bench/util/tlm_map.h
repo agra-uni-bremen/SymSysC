@@ -2,12 +2,11 @@
 #define RISCV_TLM_MAP_H
 
 
-#include <sym/wrap.h>
-
 #include <boost/format.hpp>
 #include <functional>
 #include <unordered_map>
 #include <string.h>
+#include "../../sim/wrap.h"
 
 /*
  * Optional modelling layer to simplify TLM register and memory access.

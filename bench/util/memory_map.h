@@ -3,8 +3,9 @@
 #include <functional>
 #include <vector>
 #include <assert.h>
+
+#include "../../sim/wrap.h"
 #include "common.h"
-#include <sym/wrap.h>
 
 struct RegisterRange {
 	struct WriteInfo {

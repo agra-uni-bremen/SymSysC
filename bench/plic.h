@@ -1,9 +1,8 @@
 #pragma once
 
 //#include <tlm_utils/simple_target_socket.h>
-#include <sym/wrap.h>
-//#include <systemc>
-
+#include <sim/simple_target_socket.h>
+#include <sim/wrap.h>
 #include "core/common/irq_if.h"
 #include "util/tlm_map.h"
 
@@ -14,7 +13,6 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 	static_assert(NumberInterrupts <= 4096, "out of bound");
 	static_assert(NumberCores <= 15360, "out of bound");
 
-	//tlm_utils::simple_target_socket<PLIC> tsock;
 	tlm_utils::simple_target_socket<PLIC> tsock;
 
 	std::array<external_interrupt_target*, NumberCores> target_harts{};
@@ -41,7 +39,7 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 	SC_HAS_PROCESS(PLIC);
 
-	PLIC(sc_core::sc_module_name) {
+	PLIC(sc_core::sc_module_name nem) : sc_module(nem){
 		clock_cycle = sc_core::sc_time(10, sc_core::SC_NS);
 		tsock.register_b_transport(this, &PLIC::transport);
 

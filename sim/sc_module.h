@@ -1,6 +1,6 @@
 #pragma once
-#include "sc_module_name.h"
 #include "time.h"
+#include "../sim/sc_module_name.h"
 
 namespace sc_core{
 

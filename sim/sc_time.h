@@ -6,6 +6,7 @@
  */
 
 #pragma once
+#include <inttypes.h>
 
 namespace sc_core
 {
@@ -23,6 +24,6 @@ namespace sc_core
 	{
 		uint64_t m_time;
 		sc_time_unit m_unit;
-		sc_time(uint64_t time, sc_time_unit& unit) : m_time(time),m_unit(unit){};
+		sc_time(uint64_t time, sc_time_unit unit) : m_time(time),m_unit(unit){};
 	};
 };

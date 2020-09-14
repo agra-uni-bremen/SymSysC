@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "sym/wrap.h"
 #include "bench/plic.h"
+#include "sim/wrap.h"
 
 
 int main()
