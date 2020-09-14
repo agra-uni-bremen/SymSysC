@@ -13,8 +13,7 @@ namespace tlm_utils
 		void register_b_transport(MODULE* c, void (MODULE::*cb)(tlm::tlm_generic_payload&,
                 sc_core::sc_time&))
 		{
-			//ignore time for now
-			//transports.push_back(std::bind(cb, c));
+			transports.push_back(std::bind(cb, c, std::placeholders::_1, std::placeholders::_2));
 		};
 	};
 }
