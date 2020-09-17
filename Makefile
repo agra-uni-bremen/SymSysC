@@ -1,5 +1,5 @@
 
-@phony all: bench
+all: bench
 
 
 build/Makefile:
@@ -9,5 +9,5 @@ build/Makefile:
 bench: build/Makefile
 	make -C build -j5
 	
-@phony clean:
+clean:
 	rm -r build/

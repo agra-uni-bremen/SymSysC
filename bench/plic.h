@@ -187,20 +187,34 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 
 	void run() {
-		/*
-		static Label position = INIT;
+
+		// header--
+		enum class Label
+		{
+			init,
+			here1
+		};
+
+		static Label position = Label::init;
+
 		switch (position)
 		{
-			case HERE1:
+			case Label::here1:
 				goto HERE1;
-			
+			default:
+				//nothing
+				break;
 		}
-		*/
+		// --header
+
+
+		std::cout << "run init" << std::endl;
 		
 		while (true) {
 			//sc_core::wait(e_run);
-			//position = HERE1;
-			return; //somehow  return
+			std::cout << "run wait()" << std::endl;
+			position = Label::here1;
+			return;
 HERE1:		
 			
 

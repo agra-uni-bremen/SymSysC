@@ -12,3 +12,6 @@ typedef void Process(void);
 extern std::vector<std::function<Transportfunction>> transports;
 extern std::vector<std::function<Thread>> threads;
 extern std::vector<std::function<Process>> processes;
+
+
+void run_all_threads();
