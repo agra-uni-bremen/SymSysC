@@ -1,0 +1,6 @@
+[submodule "klee-uclibc"]
+	path = klee-uclibc
+	url = https://github.com/klee/klee-uclibc.git
+[submodule "klee"]
+	path = klee
+	url = https://github.com/klee/klee.git
