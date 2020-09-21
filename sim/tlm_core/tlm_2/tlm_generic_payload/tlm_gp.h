@@ -53,11 +53,14 @@ namespace tlm
 	    tlm_command          m_command;
 	    unsigned char*       m_data;
 	    unsigned int         m_length;
+	    /*
+	    //unused
 	    tlm_response_status  m_response_status;
 	    bool                 m_dmi;
 	    unsigned char*       m_byte_enable;
 	    unsigned int         m_byte_enable_length;
 	    unsigned int         m_streaming_width;
+	    */
 	    //tlm_gp_option        m_gp_option;
 	};
 }
