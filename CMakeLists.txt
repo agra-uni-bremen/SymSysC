@@ -20,4 +20,6 @@ add_executable(testbench_plic
         main.cpp
 )
 
+target_include_directories(testbench_plic PRIVATE "klee/include")
+
 target_link_libraries(testbench_plic sim bench)

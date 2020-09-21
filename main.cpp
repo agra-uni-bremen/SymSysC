@@ -1,4 +1,5 @@
 #include <iostream>
+#include <klee/klee.h>
 
 #include "bench/plic.h"
 #include "sim/registry.hpp"
@@ -15,14 +16,12 @@ int main()
 
 	run_all_threads();
 
+	uint32_t i,
+	klee_make_symbolic(&i, sizeof(uint32_t), "interrupt number");
 
-
-	for(auto i = 1; i < 10; i++)
-	{
-		dut.gateway_trigger_interrupt(i);
-		run_all_threads();
-		run_all_threads();
-	}
+	dut.gateway_trigger_interrupt(i);
+	run_all_threads();
+	run_all_threads();
 
 	assert(dut.pending_interrupts[0] > 0);
 
