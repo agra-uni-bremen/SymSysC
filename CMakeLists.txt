@@ -14,7 +14,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld")
 
-set(BYTECODE_CXX_FLAGS -v -emit-llvm -flto -c -Xclang -disable-O0-optnone)
+set(BYTECODE_CXX_FLAGS -emit-llvm -flto -c -Xclang -disable-O0-optnone)
 #set(BYTECODE_LINKER_FLAGS -v -fuse-ld=lld -flto)-Wl,--unresolved-symbols=ignore-in-object-files
 
 
@@ -26,16 +26,22 @@ add_executable(testbench_plic
 )
 set_target_properties(testbench_plic PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(testbench_plic sim bench)
-#llvmir_attach_bc_target(testbench_plic_bc testbench_plic)
 
 
-add_executable(testbench_plic_llvm
+# As library, so no premature linking
+add_library(testbench_plic_llvm
         main.cpp
 )
 target_compile_options(testbench_plic_llvm PUBLIC -DUSE_KLEE "${BYTECODE_CXX_FLAGS}")
-target_link_options(testbench_plic_llvm PUBLIC "${BYTECODE_LINKER_FLAGS}" -Wl,--unresolved-symbols=ignore-in-object-files)
+#target_link_options(testbench_plic_llvm PUBLIC "${BYTECODE_LINKER_FLAGS}" -Wl,--unresolved-symbols=ignore-in-object-files)
 target_link_libraries(testbench_plic_llvm sim_llvm bench_llvm)
 
+
+add_custom_command(TARGET testbench_plic_llvm POST_BUILD
+    COMMAND llvm-link $$\(find -iname *.o | grep llvm | xargs echo\) -o llvm_stuffed.bc
+    DEPENDS testbench_plic_llvm
+    #OUTPUT llvm_stuffed.bc
+)
 
 # clang -flto -std=c++14 -stdlib=libc++ ./CMakeFiles/testbench_plic_llvm.dir/main.cpp.o ./sim/CMakeFiles/sim_llvm.dir/sysc/kernel/sc_time.cpp.o ./sim/CMakeFiles/sim_llvm.dir/tlm_utils/simple_target_socket.cpp.o ./sim/CMakeFiles/sim_llvm.dir/registry.cpp.o ./bench/CMakeFiles/bench_llvm.dir/plic.cpp.o -o testbench_plic_llvm
 #language llvm bytecode?
