@@ -1,5 +1,5 @@
 #include <iostream>
-#if __has_include(<klee/klee.h>)
+#ifdef USE_KLEE
 # include <klee/klee.h>
 #else
 # define klee_int( param ) 0

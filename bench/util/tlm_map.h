@@ -6,6 +6,7 @@
 #include <functional>
 #include <unordered_map>
 #include <string.h>
+#include <assert.h>
 #include <systemc>
 
 /*

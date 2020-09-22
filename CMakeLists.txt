@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(SymSysC)
+
+project(SymSysC CXX C)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
@@ -11,8 +12,10 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld")
 
-set(BYTECODE_CXX_FLAGS -v -flto -c -Xclang -disable-O0-optnone)
+set(BYTECODE_CXX_FLAGS -v -emit-llvm -flto -c -Xclang -disable-O0-optnone)
+#set(BYTECODE_LINKER_FLAGS -v -fuse-ld=lld -flto)-Wl,--unresolved-symbols=ignore-in-object-files
 
 
 subdirs(sim)
@@ -21,18 +24,18 @@ subdirs(bench)
 add_executable(testbench_plic
         main.cpp
 )
+set_target_properties(testbench_plic PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(testbench_plic sim bench)
+#llvmir_attach_bc_target(testbench_plic_bc testbench_plic)
 
-
-add_library( klee INTERFACE IMPORTED) # Is GLOBAl needed?
-set_target_properties( klee PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/klee/include")
 
 add_executable(testbench_plic_llvm
         main.cpp
 )
-target_compile_options(testbench_plic_llvm PUBLIC "${BYTECODE_CXX_FLAGS}")
-target_link_libraries(testbench_plic_llvm klee sim_llvm bench_llvm)
+target_compile_options(testbench_plic_llvm PUBLIC -DUSE_KLEE "${BYTECODE_CXX_FLAGS}")
+target_link_options(testbench_plic_llvm PUBLIC "${BYTECODE_LINKER_FLAGS}" -Wl,--unresolved-symbols=ignore-in-object-files)
+target_link_libraries(testbench_plic_llvm sim_llvm bench_llvm)
 
 
-
+# clang -flto -std=c++14 -stdlib=libc++ ./CMakeFiles/testbench_plic_llvm.dir/main.cpp.o ./sim/CMakeFiles/sim_llvm.dir/sysc/kernel/sc_time.cpp.o ./sim/CMakeFiles/sim_llvm.dir/tlm_utils/simple_target_socket.cpp.o ./sim/CMakeFiles/sim_llvm.dir/registry.cpp.o ./bench/CMakeFiles/bench_llvm.dir/plic.cpp.o -o testbench_plic_llvm
 #language llvm bytecode?
