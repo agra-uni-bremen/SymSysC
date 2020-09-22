@@ -20,6 +20,8 @@ clean-bench:
 
 clean: clean-bench
 
+klee:
+	git submodule update --init --recursive
 
 docker:
 	podman pull klee/klee
