@@ -13,6 +13,6 @@ class sc_event
 public:
 	//notify for use in benchmark to require a certain reaction
 	//void notify(const sc_time& event) { std::cout << "Event at " << event.m_time << std::endl; };
-	void notify(const sc_time event) { std::cout << "Event at " << event.m_time << std::endl; };
+	void notify(const sc_time event) { /*std::cout << "Event at " << event.m_time << std::endl*/; };
 };
 }
