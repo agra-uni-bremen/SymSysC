@@ -6,7 +6,6 @@ add_library(sim
 		${SOURCES}
         ${HEADERS}
 )
-
 add_library(sim_llvm
 		${SOURCES}
         ${HEADERS}
