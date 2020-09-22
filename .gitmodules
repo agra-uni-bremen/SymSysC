@@ -1,3 +1,0 @@
-[submodule "klee"]
-	path = klee
-	url = https://github.com/klee/klee.git
