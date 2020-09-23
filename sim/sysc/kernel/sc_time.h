@@ -24,6 +24,12 @@ namespace sc_core
 		SC_SEC
 	};
 
+	extern sc_time_unit default_time_unit;
+
+    uint64_t to_factor(const sc_time_unit unit);
+    double factor_diff(const sc_time_unit from, const sc_time_unit to);
+    inline sc_time_unit biggest_unit(const sc_time_unit a, const sc_time_unit b);
+
 	struct sc_time
 	{
 		uint64_t m_time;
@@ -33,7 +39,7 @@ namespace sc_core
 
 	    // assignment operator
 
-	    sc_time& operator = ( const sc_time& );
+	    //sc_time& operator = ( const sc_time& );
 
 
 	    // conversion functions

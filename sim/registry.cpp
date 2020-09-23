@@ -1,17 +1,12 @@
 #include "registry.hpp"
-//#include <iostream>
-//here is the actual place
+#include "klee_conf.h"
+
 
 std::vector<std::function<Transportfunction>> transports;
-std::vector<std::function<Thread>> threads;
-std::vector<std::function<Process>> processes;
 
 
 void run_all_threads()
 {
-	//std::cout << "running all threads" << std::endl;
-	for(auto &t : threads)
-	{
-		t();
-	}
+	INFO(std::cout << "running all waiting threads" << std::endl);
+	sc_core::Simcontext::get().runNextStep();
 }

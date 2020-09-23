@@ -21,7 +21,10 @@ docker-build:
 	podman build --tag klee-more:1.0 . 
 
 docker:			#todo: check if docker image exists
-	podman run --rm -ti --ulimit='stack=-1:-1' -v $(shell pwd):/home/klee/source:Z klee-more:1.0
+	podman run --rm -ti --ulimit='stack=-1:-1' \
+	-v $(shell pwd):/home/klee/source:Z \
+	-v $(shell pwd)/export:/home/klee/export:Z 
+	klee-more:1.0
 
 	
 #git submodule deinit <path_to_submodule>
