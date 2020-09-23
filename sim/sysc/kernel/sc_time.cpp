@@ -6,6 +6,28 @@ namespace sc_core
 
     sc_time_unit default_time_unit = SC_US;
 
+    std::string unit_to_string(const sc_time_unit& unit)
+    {
+        switch (unit)
+        {
+        case SC_FS:
+            return "femtoseconds";
+        case SC_PS:
+            return "picoseconds";
+        case SC_NS:
+            return "nanoseconds";
+        case SC_US:
+            return "microseconds";
+        case SC_MS:
+            return "milliseconds";
+        case SC_SEC:
+            return "seconds";
+            break;
+        default:
+            return "ERROR SECONDS";
+        }
+    }
+
     uint64_t to_factor(const sc_time_unit unit)
     {
         uint64_t factor = 1;
@@ -37,12 +59,16 @@ namespace sc_core
     {
         double factor_from = to_factor(from);
         double factor_to = to_factor(to);
-        return factor_from / factor_to;
+        return factor_to / factor_from;
     }
 
     inline sc_time_unit biggest_unit(const sc_time_unit a, const sc_time_unit b)
     {
         return a > b ? a : b;
+    }
+    inline sc_time_unit smallest_unit(const sc_time_unit a, const sc_time_unit b)
+    {
+        return a < b ? a : b;
     }
 
     /*
@@ -65,38 +91,14 @@ namespace sc_core
 
     double sc_time::to_default_time_units() const
     {
-        return m_time * factor_diff(m_unit, default_time_unit);
+        return factor_diff(m_unit, default_time_unit) * m_time;
     }
 
 
     //double to_seconds() const;
     const std::string sc_time::to_string() const
     {
-        std::string msg = std::to_string(m_time);
-        switch (m_unit)
-        {
-        case SC_FS:
-            msg += " femtoseconds";
-            break;
-        case SC_PS:
-            msg += " picoseconds";
-            break;
-        case SC_NS:
-            msg += " nanoseconds";
-            break;
-        case SC_US:
-            msg += " microseconds";
-            break;
-        case SC_MS:
-            msg += " milliseconds";
-            break;
-        case SC_SEC:
-            msg += " seconds";
-            break;
-        default:
-            msg += " ERROR SECONDS";
-        }
-        return msg;
+        return std::to_string(m_time) + " " + unit_to_string(m_unit);
     }
 
 
@@ -114,18 +116,23 @@ namespace sc_core
     bool operator <  ( const sc_time& ) const;
     bool operator <= ( const sc_time& ) const;
     bool operator >  ( const sc_time& ) const;
-    bool operator >= ( const sc_time& ) const;
+    */
+    bool sc_time::operator >= ( const sc_time& other) const
+    {
+        return to_default_time_units() >= other.to_default_time_units();
+    }
 
 
     // arithmetic operators
 
+    /*
     sc_time& operator += ( const sc_time& );
     sc_time& operator -= ( const sc_time& );
-
     */
+
     const sc_time operator + ( const sc_time& left, const sc_time& right)
     {
-        sc_time_unit unit = biggest_unit(left.m_unit, right.m_unit);
+        sc_time_unit unit = smallest_unit(left.m_unit, right.m_unit);
         return sc_time(
                 factor_diff(left.m_unit, unit) * left.m_time +
                 factor_diff(right.m_unit, unit) * right.m_time,
@@ -134,7 +141,7 @@ namespace sc_core
     }
     const sc_time operator - ( const sc_time& left, const sc_time& right)
     {
-        sc_time_unit unit = biggest_unit(left.m_unit, right.m_unit);
+        sc_time_unit unit = smallest_unit(left.m_unit, right.m_unit);
         return sc_time(
                 factor_diff(left.m_unit, unit) * left.m_time -
                 factor_diff(right.m_unit, unit) * right.m_time,

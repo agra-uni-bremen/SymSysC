@@ -26,15 +26,17 @@ namespace sc_core
 
 	extern sc_time_unit default_time_unit;
 
+	std::string unit_to_string(const sc_time_unit& unit);
     uint64_t to_factor(const sc_time_unit unit);
     double factor_diff(const sc_time_unit from, const sc_time_unit to);
     inline sc_time_unit biggest_unit(const sc_time_unit a, const sc_time_unit b);
+    inline sc_time_unit smallest_unit(const sc_time_unit a, const sc_time_unit b);
 
 	struct sc_time
 	{
 		uint64_t m_time;
 		sc_time_unit m_unit;
-		sc_time() : m_time(0),m_unit(SC_MS){};
+		sc_time() : m_time(0),m_unit(default_time_unit){};
 		sc_time(uint64_t time, sc_time_unit unit) : m_time(time),m_unit(unit){};
 
 	    // assignment operator

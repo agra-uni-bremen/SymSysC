@@ -23,11 +23,15 @@ typedef void Process(void);
 
 class Simcontext
 {
-
-    std::vector<std::function<Thread>> threads;
+    //TODO: Prio-queue got Threads
+    typedef std::pair<std::function<Thread>,sc_time> Threadlist;
+    std::vector<Threadlist> threads;
     std::vector<std::function<Process>> processes;
 
     sc_time global_time;
+
+    std::function<Process>* activeThread = nullptr;
+
 
 public:
 
@@ -36,17 +40,32 @@ public:
         return context;
     }
 
-    void addThread(std::function<Thread> t) {
-        threads.push_back(t);
+    sc_time getGlobalTime()
+    {
+        return global_time;
     }
 
-    void addProcess(std::function<Process> t) {
-        processes.push_back(t);
+    void addThread(std::function<Thread> t) {
+        threads.push_back(Threadlist(t, sc_time(0, default_time_unit)));
+    }
+
+    void addProcess(std::function<Process> p) {
+        processes.push_back(p);
     }
 
     void runNextStep()
     {
-        INFO(std::cout << "runNextStep not yet implemented" << std::endl);
+        for(Threadlist& p : threads)
+        {
+            if(p.second == global_time)
+            {
+                activeThread = &p.first;
+                p.first();
+            }
+        }
+        activeThread = nullptr;
+
+        //TODO: step the biggest possible time forward
     }
 
     void printInfo()

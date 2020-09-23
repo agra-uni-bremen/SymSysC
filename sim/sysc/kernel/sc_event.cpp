@@ -1,14 +1,13 @@
 #include "sc_event.h"
+#include "sc_simcontext.h"
 #include <klee_conf.h>
 
 namespace sc_core
 {
 
-sc_time global_time;
-
 void sc_event::notify(const sc_time& time) {
     INFO(std::cout << "notify in " << time.to_string() << std::endl);
-    time_to_wake = global_time + time;
+    time_to_wake = Simcontext::get().getGlobalTime()+ time;
 };
 
 void wait(const sc_event& event)

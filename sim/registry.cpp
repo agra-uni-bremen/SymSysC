@@ -5,7 +5,7 @@
 std::vector<std::function<Transportfunction>> transports;
 
 
-void run_all_threads()
+void minikernel_step()
 {
 	INFO(std::cout << "running all waiting threads" << std::endl);
 	sc_core::Simcontext::get().runNextStep();
