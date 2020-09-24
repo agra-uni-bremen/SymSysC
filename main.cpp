@@ -35,17 +35,29 @@ int main()
 
 	minikernel_step();
 
-	uint32_t i = klee_int("interrupt number");
+	//uint32_t i = klee_int("interrupt number");
 
-	i = 1;
 
-	dut.gateway_trigger_interrupt(i);
+    dut.gateway_trigger_interrupt(1);
 
-	assert(dut.pending_interrupts[0] > 0);
+    assert(dut.pending_interrupts[0] > 0);
 
-	minikernel_step();
+    minikernel_step();
 
-	assert(it.was_triggered);
+    assert(it.was_triggered);
+
+    it.was_triggered = false;
+
+	for(unsigned i = 1; i < 32; i++)
+	{
+        dut.gateway_trigger_interrupt(i);
+
+        assert(dut.pending_interrupts[0] > 0);
+
+        minikernel_step();
+
+        assert(!it.was_triggered);
+	}
 
 	minikernel_step();
 	minikernel_step();
