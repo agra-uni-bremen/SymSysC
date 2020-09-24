@@ -37,11 +37,17 @@ target_compile_options(testbench_plic_llvm PUBLIC -DUSE_KLEE "${BYTECODE_CXX_FLA
 target_link_libraries(testbench_plic_llvm sim_llvm bench_llvm)
 
 
-add_custom_command(TARGET testbench_plic_llvm POST_BUILD
+add_custom_command(#TARGET testbench_plic_llvm POST_BUILD
     COMMAND llvm-link $$\(find -iname *.o | grep llvm | xargs echo\) -o llvm_stuffed.bc
     DEPENDS testbench_plic_llvm
-    #OUTPUT llvm_stuffed.bc
+    OUTPUT llvm_stuffed.bc
 )
+
+add_custom_target(run_klee_tests
+    COMMAND time klee --libcxx --libc=uclibc -posix-runtime llvm_stuffed.bc
+    DEPENDS llvm_stuffed.bc
+)
+
 
 # clang -flto -std=c++14 -stdlib=libc++ ./CMakeFiles/testbench_plic_llvm.dir/main.cpp.o ./sim/CMakeFiles/sim_llvm.dir/sysc/kernel/sc_time.cpp.o ./sim/CMakeFiles/sim_llvm.dir/tlm_utils/simple_target_socket.cpp.o ./sim/CMakeFiles/sim_llvm.dir/registry.cpp.o ./bench/CMakeFiles/bench_llvm.dir/plic.cpp.o -o testbench_plic_llvm
 #language llvm bytecode?

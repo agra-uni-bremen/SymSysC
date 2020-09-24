@@ -208,11 +208,11 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 		// --header
 
 
-		// std::cout << "run init" << std::endl;
+		INFO(std::cout << "run init" << std::endl);
 		
 		while (true) {
-			//sc_core::wait(e_run);
-			// std::cout << "run wait()" << std::endl;
+			INFO(std::cout << "run wait()" << std::endl);
+			sc_core::wait(e_run);
 			position = Label::here1;
 			return;
 HERE1:		

@@ -28,7 +28,7 @@ docker-build:
 docker:			#todo: check if docker image exists
 	$(container_prog) run --rm -ti --ulimit='stack=-1:-1' -v $(shell pwd):/home/klee/source:Z klee-more:1.0
 
-	
+
 #git submodule deinit <path_to_submodule>
 #git rm <path_to_submodule>
 #git commit-m "Removed submodule "
