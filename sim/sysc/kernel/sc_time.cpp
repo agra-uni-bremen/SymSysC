@@ -105,18 +105,31 @@ namespace sc_core
 
     // relational operators
 
-    bool sc_time::operator == ( const sc_time& other) const
+    bool sc_time::operator == ( const sc_time& other ) const
     {
         //double max_factor = max(to_factor(m_unit), to_factor(other.m_unit));
         return to_default_time_units() == other.to_default_time_units();
     }
 
-    /* TODO DO
-    bool operator != ( const sc_time& ) const;
-    bool operator <  ( const sc_time& ) const;
-    bool operator <= ( const sc_time& ) const;
-    bool operator >  ( const sc_time& ) const;
-    */
+
+    bool  sc_time::operator != ( const sc_time& other ) const
+    {
+        return to_default_time_units() != other.to_default_time_units();
+    }
+
+    bool sc_time::operator <  ( const sc_time& other ) const
+    {
+        return to_default_time_units() < other.to_default_time_units();
+    }
+    bool sc_time::operator <= ( const sc_time& other) const
+    {
+        return to_default_time_units() <= other.to_default_time_units();
+    }
+    bool sc_time::operator >  ( const sc_time& other ) const
+    {
+        return to_default_time_units() > other.to_default_time_units();
+    }
+
     bool sc_time::operator >= ( const sc_time& other) const
     {
         return to_default_time_units() >= other.to_default_time_units();

@@ -37,7 +37,7 @@ int main()
 
 	uint32_t i = klee_int("interrupt number");
 
-	//i = 1;
+	i = 1;
 
 	dut.gateway_trigger_interrupt(i);
 
@@ -46,6 +46,9 @@ int main()
 	minikernel_step();
 
 	assert(it.was_triggered);
+
+	minikernel_step();
+	minikernel_step();
 
 	return 0;
 }

@@ -23,7 +23,6 @@ docker-build:
 docker:			#todo: check if docker image exists
 	podman run --rm -ti --ulimit='stack=-1:-1' \
 	-v $(shell pwd):/home/klee/source:Z \
-	-v $(shell pwd)/export:/home/klee/export:Z 
 	klee-more:1.0
 
 	

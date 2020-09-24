@@ -7,12 +7,25 @@ namespace sc_core
 
 void sc_event::notify(const sc_time& time) {
     INFO(std::cout << "notify in " << time.to_string() << std::endl);
-    time_to_wake = Simcontext::get().getGlobalTime()+ time;
+
+    assert(waitingThread != nullptr && "Notify on unwaited event");
+    Simcontext::get().addWaketime(waitingThread, Simcontext::get().getGlobalTime() + time);
 };
 
-void wait(const sc_event& event)
+/*
+sc_time sc_event::getWaketime()
 {
-    INFO(std::cout << "NOT waiting for event at " << event.time_to_wake.to_string() << std::endl);
+    return time_to_wake;
+}
+*/
+
+void wait(sc_event& event)
+{
+    event.waitingThread = Simcontext::getActiveThread();
 }
 
+void wait(const sc_time& time)
+{
+    Simcontext::get().addWaketime(Simcontext::get().getGlobalTime() + time);
+}
 }
