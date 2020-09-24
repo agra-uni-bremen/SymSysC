@@ -50,5 +50,7 @@ int main()
 	minikernel_step();
 	minikernel_step();
 
+	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
+
 	return 0;
 }
