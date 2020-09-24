@@ -1,5 +1,10 @@
 THREADS := $(shell nproc)
 
+container_prog:= podman
+ifeq (, $(shell which podman))
+ container_prog:= docker
+endif
+
 all: bench
 
 build/Makefile:
@@ -18,10 +23,10 @@ clean-bench:
 clean: clean-bench
 
 docker-build:
-	podman build --tag klee-more:1.0 . 
+	$(container_prog) build --tag klee-more:1.0 . 
 
 docker:			#todo: check if docker image exists
-	podman run --rm -ti --ulimit='stack=-1:-1' -v $(shell pwd):/home/klee/source:Z klee-more:1.0
+	$(container_prog) run --rm -ti --ulimit='stack=-1:-1' -v $(shell pwd):/home/klee/source:Z klee-more:1.0
 
 	
 #git submodule deinit <path_to_submodule>
