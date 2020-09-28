@@ -1,6 +1,3 @@
-somehow implement notifies on sc_events?
-	- Minikernel.run() -> Check next time waiting
-	
 Performance testing on side
 	- compare C/C++
 
