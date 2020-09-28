@@ -26,7 +26,8 @@ docker-build:
 	$(container_prog) build --tag klee-more:1.0 . 
 
 docker:			#todo: check if docker image exists
-	$(container_prog) run --rm -ti --ulimit='stack=-1:-1' -v $(shell pwd):/home/klee/source:Z klee-more:1.0
+	$(container_prog) run -ti --ulimit='stack=-1:-1' -v $(shell pwd):/home/klee/source:Z klee-more:1.0
+	#$(container_prog) run --rm -ti --ulimit='stack=-1:-1' -v $(shell pwd):/home/klee/source:Z klee-more:1.0
 
 
 #git submodule deinit <path_to_submodule>
