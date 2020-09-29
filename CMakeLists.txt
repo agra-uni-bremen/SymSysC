@@ -14,7 +14,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld")
 
-set(BYTECODE_CXX_FLAGS -emit-llvm -flto -c -Xclang -disable-O0-optnone)
+set(BYTECODE_CXX_FLAGS -DUSE_KLEE -emit-llvm -flto -c -Xclang -disable-O0-optnone)
 #set(BYTECODE_LINKER_FLAGS -v -fuse-ld=lld -flto)-Wl,--unresolved-symbols=ignore-in-object-files
 
 
@@ -32,7 +32,7 @@ target_link_libraries(testbench_plic sim bench)
 add_library(testbench_plic_llvm
         main.cpp
 )
-target_compile_options(testbench_plic_llvm PUBLIC -DUSE_KLEE "${BYTECODE_CXX_FLAGS}")
+target_compile_options(testbench_plic_llvm PUBLIC "${BYTECODE_CXX_FLAGS}")
 #target_link_options(testbench_plic_llvm PUBLIC "${BYTECODE_LINKER_FLAGS}" -Wl,--unresolved-symbols=ignore-in-object-files)
 target_link_libraries(testbench_plic_llvm sim_llvm bench_llvm)
 
