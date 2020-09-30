@@ -150,8 +150,8 @@ namespace sc_core
                 factor_diff(left.m_unit, unit) * left.m_time +
                 factor_diff(right.m_unit, unit) * right.m_time,
                 unit);
-
     }
+
     const sc_time operator - ( const sc_time& left, const sc_time& right)
     {
         sc_time_unit unit = smallest_unit(left.m_unit, right.m_unit);

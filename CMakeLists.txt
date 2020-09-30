@@ -44,7 +44,8 @@ add_custom_command(#TARGET testbench_plic_llvm POST_BUILD
 )
 
 add_custom_target(run_klee_tests
-    COMMAND time klee --libcxx --libc=uclibc -posix-runtime llvm_stuffed.bc
+    #COMMAND time klee --libcxx --libc=uclibc -debug-print-instructions=src:file --only-output-states-covering-new --posix-runtime llvm_stuffed.bc
+    COMMAND time klee --libcxx --libc=uclibc --only-output-states-covering-new --posix-runtime llvm_stuffed.bc
     DEPENDS llvm_stuffed.bc
 )
 
