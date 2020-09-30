@@ -18,11 +18,33 @@ struct Simple_interrupt_target : public external_interrupt_target
         INFO(std::cout << "Interrupt triggered" << std::endl);
         was_triggered = true;
     };
+
     void clear_external_interrupt()
     {
         INFO(std::cout << "Interrupt cleared" << std::endl);
-
         was_cleared = true;
+    };
+
+    void claim_interrupt()
+    {
+        if(was_triggered)
+        {
+            sc_core::sc_time delay;
+            tlm::tlm_generic_payload pl;
+            uint32_t interrupt = 0;
+            //0x200004 + n*8, &hart_claim_response[n]});
+            pl.set_read();
+            pl.set_address(0x200004);   //claim_response register
+            pl.set_data_length(sizeof(uint32_t));
+            pl.set_data_ptr(reinterpret_cast<unsigned char*>(&interrupt));
+
+            dut.transport(pl, delay);
+
+            //If the interrupt was triggered, there has to be an interrupt in register
+            assert(interrupt > 0);
+
+            INFO(std::cout << "Interrupt " << interrupt << " claimed" << std::endl);
+        }
     }
 };
 
@@ -53,6 +75,7 @@ int main()
 
     dut.gateway_trigger_interrupt(i);
 
+    //Is the pending interrupts register changed?
     if(i < 32)
         assert(dut.pending_interrupts[0] > 0);
     else
@@ -60,7 +83,13 @@ int main()
 
     minikernel_step();
 
+    //the step should trigger an external interrupt
     assert(sit.was_triggered);
+
+    sit.claim_interrupt();
+
+    //The pending interrupt register should be cleared after claim
+    assert(dut.pending_interrupts[0] == 0 && dut.pending_interrupts[1] == 0);
 
     return 0;
 
