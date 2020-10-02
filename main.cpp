@@ -86,6 +86,8 @@ int main()
     //the step should trigger an external interrupt
     assert(sit.was_triggered);
 
+    return 0;
+
     sit.claim_interrupt();
 
     //The pending interrupt register should be cleared after claim
