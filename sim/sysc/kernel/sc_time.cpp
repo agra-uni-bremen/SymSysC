@@ -62,6 +62,12 @@ namespace sc_core
         return factor_to / factor_from;
     }
 
+    //same as factor_diff, but always >= 1
+    uint64_t abs_factor_diff(const sc_time_unit a, const sc_time_unit b)
+    {
+        return std::max(to_factor(a), to_factor(b)) / std::min(to_factor(a), to_factor(b));
+    }
+
     inline sc_time_unit biggest_unit(const sc_time_unit a, const sc_time_unit b)
     {
         return a > b ? a : b;
@@ -94,6 +100,14 @@ namespace sc_core
         return factor_diff(m_unit, default_time_unit) * m_time;
     }
 
+    uint64_t sc_time::to_smaller_unit(const sc_time_unit other) const
+    {
+        if(to_factor(m_unit) >= to_factor(other))
+        {
+            return m_time;
+        }
+        return m_time * abs_factor_diff(m_unit, other);
+    }
 
     //double to_seconds() const;
     const std::string sc_time::to_string() const
@@ -107,32 +121,30 @@ namespace sc_core
 
     bool sc_time::operator == ( const sc_time& other ) const
     {
-        //double max_factor = max(to_factor(m_unit), to_factor(other.m_unit));
-        return to_default_time_units() == other.to_default_time_units();
+        return to_smaller_unit(other.m_unit) == other.to_smaller_unit(m_unit);
     }
 
 
     bool  sc_time::operator != ( const sc_time& other ) const
     {
-        return to_default_time_units() != other.to_default_time_units();
+        return to_smaller_unit(other.m_unit) != other.to_smaller_unit(m_unit);
     }
 
     bool sc_time::operator <  ( const sc_time& other ) const
     {
-        return to_default_time_units() < other.to_default_time_units();
+        return to_smaller_unit(other.m_unit) < other.to_smaller_unit(m_unit);
     }
     bool sc_time::operator <= ( const sc_time& other) const
     {
-        return to_default_time_units() <= other.to_default_time_units();
+        return to_smaller_unit(other.m_unit) <= other.to_smaller_unit(m_unit);
     }
     bool sc_time::operator >  ( const sc_time& other ) const
     {
-        return to_default_time_units() > other.to_default_time_units();
+        return to_smaller_unit(other.m_unit) > other.to_smaller_unit(m_unit);
     }
-
     bool sc_time::operator >= ( const sc_time& other) const
     {
-        return to_default_time_units() >= other.to_default_time_units();
+        return to_smaller_unit(other.m_unit) >= other.to_smaller_unit(m_unit);
     }
 
 
@@ -145,20 +157,18 @@ namespace sc_core
 
     const sc_time operator + ( const sc_time& left, const sc_time& right)
     {
-        sc_time_unit unit = smallest_unit(left.m_unit, right.m_unit);
         return sc_time(
-                factor_diff(left.m_unit, unit) * left.m_time +
-                factor_diff(right.m_unit, unit) * right.m_time,
-                unit);
-
+                left.to_smaller_unit(right.m_unit) +
+                right.to_smaller_unit(left.m_unit),
+                smallest_unit(left.m_unit, right.m_unit));
     }
+
     const sc_time operator - ( const sc_time& left, const sc_time& right)
     {
-        sc_time_unit unit = smallest_unit(left.m_unit, right.m_unit);
         return sc_time(
-                factor_diff(left.m_unit, unit) * left.m_time -
-                factor_diff(right.m_unit, unit) * right.m_time,
-                unit);
+                left.to_smaller_unit(right.m_unit) -
+                right.to_smaller_unit(left.m_unit),
+                smallest_unit(left.m_unit, right.m_unit));
     }
 
     /*

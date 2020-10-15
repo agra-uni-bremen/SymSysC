@@ -15,11 +15,11 @@ public:
 
     ~sc_module_name(){};
 
-    operator const char*() const {return m_name.c_str() ;};
+    operator const char*() const {return m_name ;};
 
 private:
 
-    const std::string     m_name;
+    const char*     m_name;
 
 private:
 

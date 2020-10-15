@@ -27,8 +27,9 @@ namespace sc_core
 	extern sc_time_unit default_time_unit;
 
 	std::string unit_to_string(const sc_time_unit& unit);
-    uint64_t to_factor(const sc_time_unit unit);
-    double factor_diff(const sc_time_unit from, const sc_time_unit to);
+	uint64_t to_factor(const sc_time_unit unit);
+	double factor_diff(const sc_time_unit from, const sc_time_unit to);
+	uint64_t abs_factor_diff(const sc_time_unit a, const sc_time_unit b);
     inline sc_time_unit biggest_unit(const sc_time_unit a, const sc_time_unit b);
     inline sc_time_unit smallest_unit(const sc_time_unit a, const sc_time_unit b);
 
@@ -49,6 +50,7 @@ namespace sc_core
 	    uint64_t value() const;      // relative to the time resolution
 	    double to_double() const;  // relative to the time resolution
 	    double to_default_time_units() const;
+	    uint64_t to_smaller_unit(const sc_time_unit other) const;
 	    double to_seconds() const;
 	    const std::string to_string() const;
 
