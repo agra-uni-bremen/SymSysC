@@ -5,22 +5,32 @@ ifeq (, $(shell which podman))
  container_prog:= docker
 endif
 
-all: bench
+all: native bytecode
 
-build/Makefile:
+build/:
 	mkdir build || true
-	cd build && cmake ..
 
-bench: build/Makefile
-	make -C build -j$(THREADS)
+build/native/Makefile: build/
+	mkdir build/native || true
+	cd build/native && cmake -DBUILD=native ../..
+	
+build/bytecode/Makefile: build/
+	mkdir build/bytecode || true
+	cd build/bytecode && cmake -DBUILD=bytecode ../..
 
-bench-test:	bench
-	cd build
+native: build/native/Makefile
+	make -C build/native -j$(THREADS)
 
-clean-bench:
-	rm -r build/
+bytecode: build/bytecode/Makefile
+	make -C build/bytecode -j$(THREADS)
 
-clean: clean-bench
+clean-native:
+	rm -r build/native
+
+clean-bytecode:
+	rm -r build/bytecode
+
+clean: clean-native clean-bytecode
 
 docker-build:
 	$(container_prog) build --tag klee-more:1.0 . 

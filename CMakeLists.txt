@@ -7,13 +7,20 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-project(SymSysC CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
-enable_language(BYTECODE)
+
+project(SymSysC NONE)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+
+if(BUILD STREQUAL "bytecode")
+	enable_language(BYTECODE)
+else() #native
+	enable_language(CXX)
 endif()
 
 
@@ -26,12 +33,12 @@ add_executable(testbench_plic
 target_link_libraries(testbench_plic sim bench)
 
 
-add_executable(testbench_plic_llvm
-        bench_plic.cpp
-)
-#set_target_properties(testbench_plic_llvm PROPERTIES LANGUAGE BYTECODE)
+#add_executable(testbench_plic_llvm
+#        bench_plic.cpp
+#)
+
 #target_compile_options(testbench_plic_llvm PUBLIC "${BYTECODE_CXX_FLAGS}")
-target_link_libraries(testbench_plic_llvm sim_llvm bench_llvm)
+#target_link_libraries(testbench_plic_llvm sim_llvm bench_llvm)
 
 
 add_custom_command(
