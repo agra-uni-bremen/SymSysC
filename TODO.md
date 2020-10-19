@@ -5,10 +5,12 @@ Think of concrete testbenches
 	- priority vs order of interrupts
 	- If interrupt is done, sometime (in timeout) it should be triggered
 
-(nice to have: standard assersions (no crash, memory leak, ..))
+(nice to have: standard assertions (no crash, memory leak, ..))
 
 klee/angr comparison?
+	Kosten / Nutzen?
 
+Hierachical waits in called functions?
 
 --------------------------------------------------------------------------
 |   Path    |  Instrs|  Time(s)|  ICov(%)|  BCov(%)|  ICount|  TSolver(%)|
