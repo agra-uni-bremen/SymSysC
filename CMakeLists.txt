@@ -1,41 +1,44 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-project(SymSysC CXX C)
-
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Debug)
-endif()
-
 set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld")
 
-set(BYTECODE_CXX_FLAGS -DUSE_KLEE -emit-llvm -flto -c -Xclang -disable-O0-optnone)
-#set(BYTECODE_LINKER_FLAGS -v -fuse-ld=lld -flto)-Wl,--unresolved-symbols=ignore-in-object-files
+project(SymSysC CXX C)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+enable_language(BYTECODE)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
 
 
 subdirs(sim)
 subdirs(bench)
 
 add_executable(testbench_plic
-        main.cpp
+        bench_plic.cpp
 )
-set_target_properties(testbench_plic PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(testbench_plic sim bench)
 
 
-# As library, so no premature linking
-add_library(testbench_plic_llvm
-        main.cpp
+add_executable(testbench_plic_llvm
+        bench_plic.cpp
 )
-target_compile_options(testbench_plic_llvm PUBLIC "${BYTECODE_CXX_FLAGS}")
-#target_link_options(testbench_plic_llvm PUBLIC "${BYTECODE_LINKER_FLAGS}" -Wl,--unresolved-symbols=ignore-in-object-files)
+#set_target_properties(testbench_plic_llvm PROPERTIES LANGUAGE BYTECODE)
+#target_compile_options(testbench_plic_llvm PUBLIC "${BYTECODE_CXX_FLAGS}")
 target_link_libraries(testbench_plic_llvm sim_llvm bench_llvm)
 
+
+add_custom_command(
+    COMMAND llvm-link $$\(find -iname *.o | grep llvm | xargs echo\) -o "${OUTPUT_FILE_NAME}"
+    DEPENDS "${SRC}"
+    OUTPUT "${OUTPUT_FILE_NAME}"
+)
 
 add_custom_command(#TARGET testbench_plic_llvm POST_BUILD
     COMMAND llvm-link $$\(find -iname *.o | grep llvm | xargs echo\) -o llvm_stuffed.bc

@@ -62,7 +62,6 @@ int main()
 	//interrupt line plic -> sit
 	dut.target_harts[0] = &sit;
 
-
 	INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
 	sc_core::Simcontext::get().printInfo();
 
