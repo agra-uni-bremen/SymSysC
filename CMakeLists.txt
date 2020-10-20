@@ -18,9 +18,11 @@ endif()
 
 
 if(BUILD STREQUAL "bytecode")
-	enable_language(BYTECODE)
+    enable_language(BYTECODE)
+    MESSAGE("Building LLVM BYTECODE for Klee")
 else() #native
-	enable_language(CXX)
+    enable_language(CXX)
+    MESSAGE("Building native C/C++")
 endif()
 
 
@@ -40,7 +42,7 @@ target_link_libraries(testbench_sensor sim bench)
 
 add_custom_target(run_klee_tests
     #COMMAND time klee --libcxx --libc=uclibc -posix-runtime llvm_stuffed.bc
-    COMMAND time klee --only-output-states-covering-new testbench_plic
+    COMMAND time klee --only-output-states-covering-new -posix-runtime testbench_plic
     DEPENDS testbench_plic
 )
 

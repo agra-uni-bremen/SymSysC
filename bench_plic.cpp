@@ -1,4 +1,4 @@
-#include "bench/plic.h"
+#include "bench/plic.hpp"
 #include "sim/registry.hpp"
 #include "sim/klee_conf.h"
 

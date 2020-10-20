@@ -1,4 +1,4 @@
-#include "bench/sensor.h"
+#include "bench/sensor.hpp"
 #include "sim/registry.hpp"
 #include "sim/klee_conf.h"
 
