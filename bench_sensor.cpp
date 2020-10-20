@@ -34,11 +34,12 @@ int main()
     tlm::tlm_generic_payload pl;
     uint32_t address = klee_int("address");
     uint32_t length = klee_int("length");
-    klee_assume(length < INT32_MAX);
+    const uint32_t max_len = 2013;
+    klee_assume(length <= max_len);
     pl.set_read();
     pl.set_address(address);
     pl.set_data_length(length);
-    uint8_t* buffer = new uint8_t[INT32_MAX];
+    uint8_t* buffer = new uint8_t[max_len];
     pl.set_data_ptr(buffer);
 
     dut.transport(pl, delay);
