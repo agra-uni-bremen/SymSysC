@@ -42,17 +42,20 @@ struct SimpleSensor : public sc_core::sc_module {
 		auto len = trans.get_data_length();
 		auto ptr = trans.get_data_ptr();
 
+		assert(len > 0 && "invalid read with length = 0");
+
 		if (addr <= 63) {
 			// access data frame
-			assert(cmd == tlm::TLM_READ_COMMAND);
-			assert((addr + len) <= sizeof(memory.data_frame));
+			assert(cmd == tlm::TLM_READ_COMMAND && "data is read only");
+			assert((addr + len) <= sizeof(memory.data_frame) && "read out of memory map");
 
 			// return last generated random data at requested address
 			memcpy(ptr, &memory.data_frame[addr], len);
 		} else {
 			assert(len == 4 && "only allow to read/write whole register");
 
-			assert(addr > offsetof(union Memory, filter) && "access to non-mapped address");
+			//intentional bug: wrong offset calculation
+			assert(addr <= 1 + offsetof(union Memory, filter) && "access to non-mapped address");
 
 			// trigger pre read/write actions
 			if (cmd == tlm::TLM_WRITE_COMMAND) {
