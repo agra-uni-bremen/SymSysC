@@ -14,7 +14,7 @@ struct test_interrupt_gateway : interrupt_gateway{
 
 int main()
 {
-	uint32_t interrupt = klee_int();
+	uint32_t interrupt = klee_int("Interrupt");
 	SimpleSensor dut(interrupt);
 	test_interrupt_gateway tig;
 	dut.plic = &tig;
