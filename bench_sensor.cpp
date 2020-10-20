@@ -4,7 +4,9 @@
 
 
 struct test_interrupt_gateway : interrupt_gateway{
+	bool triggered_irq = 0;
 	void gateway_trigger_interrupt(uint32_t irq_id){
+		triggered_irq = irq_id;
 		INFO(std::cout << "interrupt " << irq_id << " fired." << std::endl;);
 	}
 };
@@ -21,7 +23,10 @@ int main()
 	sc_core::Simcontext::get().printInfo();
 
 	minikernel_step();
+
 	minikernel_step();
+
+	assert(interrupt == tig.triggered_irq);
 
 	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
 
