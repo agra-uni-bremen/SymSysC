@@ -12,6 +12,8 @@ struct test_interrupt_gateway : interrupt_gateway{
 };
 
 
+
+
 int main()
 {
 	uint32_t interrupt = klee_int("Interrupt");
@@ -22,11 +24,26 @@ int main()
 	INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
 	sc_core::Simcontext::get().printInfo();
 
-	minikernel_step();
 
-	minikernel_step();
+	minikernel_step();	// 0
+	minikernel_step();	// 40ms
 
 	assert(interrupt == tig.triggered_irq);
+
+	sc_core::sc_time delay;
+    tlm::tlm_generic_payload pl;
+    uint32_t address = klee_int("address");
+    uint32_t length = klee_int("length");
+    klee_assume(length < INT32_MAX);
+    pl.set_read();
+    pl.set_address(address);
+    pl.set_data_length(length);
+    uint8_t buffer[length];
+    pl.set_data_ptr(buffer);
+
+    dut.transport(pl, delay);
+
+
 
 	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
 

@@ -96,13 +96,13 @@ struct SimpleSensor : public sc_core::sc_module {
 				//nothing
 				break;
 		}
-		INFO(std::cout << "run init" << std::endl);
+		//INFO(std::cout << "run init" << std::endl);
 		// --header
 
 		while (true) {
 			run_event.notify(sc_core::sc_time(memory.scaler, sc_core::SC_MS));
 
-			INFO(std::cout << "run wait()" << std::endl);
+			//INFO(std::cout << "run wait()" << std::endl);
 			sc_core::wait(run_event);  // 40 times per second by default
 			position = Label::here1;
 			return;

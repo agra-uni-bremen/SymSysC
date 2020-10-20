@@ -6,12 +6,13 @@ namespace sc_core
 {
 
 void sc_event::notify(const sc_time& time) {
-    INFO(std::cout << "notify in " << time.to_string() << std::endl);
-
     //assert(waitingThread != nullptr && "Notify on unwaited event");
     auto notified_thread = waitingThread;
     if(notified_thread == nullptr)	//this may happen if a notify is inside thread
     	notified_thread = Simcontext::getActiveThread();
+
+    INFO(std::cout << "\tnotify " << notified_thread << " in " << time.to_string() << std::endl);
+
     Simcontext::get().addWaketime(notified_thread, Simcontext::get().getGlobalTime() + time);
 };
 
