@@ -50,9 +50,9 @@ struct SimpleSensor : public sc_core::sc_module {
 			// return last generated random data at requested address
 			memcpy(ptr, &memory.data_frame[addr], len);
 		} else {
-			assert(len == 4);  // NOTE: only allow to read/write whole register
+			assert(len == 4 && "only allow to read/write whole register");
 
-			assert(addr > offsetof(union Memory, filter));  // access to non-mapped address
+			assert(addr > offsetof(union Memory, filter) && "access to non-mapped address");
 
 			// trigger pre read/write actions
 			if (cmd == tlm::TLM_WRITE_COMMAND) {
