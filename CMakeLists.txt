@@ -42,7 +42,7 @@ target_link_libraries(testbench_sensor sim bench)
 
 add_custom_target(run_klee_tests
     #COMMAND time klee --libcxx --libc=uclibc -posix-runtime llvm_stuffed.bc
-    COMMAND time klee --only-output-states-covering-new -posix-runtime testbench_plic
+    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_plic
     DEPENDS testbench_plic
 )
 

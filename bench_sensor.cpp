@@ -4,7 +4,7 @@
 
 
 struct test_interrupt_gateway : interrupt_gateway{
-	bool triggered_irq = 0;
+	uint32_t triggered_irq = 0;
 	void gateway_trigger_interrupt(uint32_t irq_id){
 		triggered_irq = irq_id;
 		INFO(std::cout << "interrupt " << irq_id << " fired." << std::endl;);
