@@ -72,7 +72,6 @@ int main()
 
 	klee_assume(i < numberInterrupts);
 
-
     dut.gateway_trigger_interrupt(i);
 
     //Is the pending interrupts register changed?
@@ -85,8 +84,6 @@ int main()
 
     //the step should trigger an external interrupt
     assert(sit.was_triggered);
-
-    return 0;
 
     sit.claim_interrupt();
 

@@ -92,7 +92,11 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 	void clear_pending_interrupt(unsigned irq_id) {
 		assert(irq_id >= 0 && irq_id < NumberInterrupts);  //NOTE: ignore clear of zero interrupt (zero is not available)
-		//std::cout << "[vp::plic] clear pending interrupt " << irq_id << std::endl;
+		INFO(std::cout << "[vp::plic] clear pending interrupt " << irq_id << std::endl);
+
+		// Intentional bug
+		if(irq_id == 16)
+			return;
 
 		unsigned idx = irq_id / 32;
 		unsigned off = irq_id % 32;
@@ -140,7 +144,7 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 					unsigned min_id = hart_get_next_pending_interrupt(0, false);
 					hart_claim_response[i] = min_id;  // zero means no more interrupt to claim
 					clear_pending_interrupt(min_id);
-					// std::cout << "[vp::plic] claim interrupt " << min_id << std::endl;
+					INFO(std::cout << "[vp::plic] claim interrupt " << min_id << std::endl);
 					break;
 				}
 			}
@@ -207,10 +211,8 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 				//nothing
 				break;
 		}
-		// --header
-
-
 		INFO(std::cout << "run init" << std::endl);
+		// --header
 		
 		while (true) {
 			INFO(std::cout << "run wait()" << std::endl);

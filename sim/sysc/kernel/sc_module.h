@@ -25,6 +25,7 @@ protected:
 
 public:
 	sc_module(sc_module_name name) : m_name(name){};
+	sc_module() : m_name(""){};
 };
 
 }

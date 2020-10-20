@@ -32,38 +32,19 @@ add_executable(testbench_plic
 )
 target_link_libraries(testbench_plic sim bench)
 
-
-#add_executable(testbench_plic_llvm
-#        bench_plic.cpp
-#)
-
-#target_compile_options(testbench_plic_llvm PUBLIC "${BYTECODE_CXX_FLAGS}")
-#target_link_libraries(testbench_plic_llvm sim_llvm bench_llvm)
-
-
-add_custom_command(
-    COMMAND llvm-link $$\(find -iname *.o | grep llvm | xargs echo\) -o "${OUTPUT_FILE_NAME}"
-    DEPENDS "${SRC}"
-    OUTPUT "${OUTPUT_FILE_NAME}"
+add_executable(testbench_sensor
+        bench_sensor.cpp
 )
+target_link_libraries(testbench_sensor sim bench)
 
-add_custom_command(#TARGET testbench_plic_llvm POST_BUILD
-    COMMAND llvm-link $$\(find -iname *.o | grep llvm | xargs echo\) -o llvm_stuffed.bc
-    DEPENDS testbench_plic_llvm
-    OUTPUT llvm_stuffed.bc
-)
 
 add_custom_target(run_klee_tests
     #COMMAND time klee --libcxx --libc=uclibc -posix-runtime llvm_stuffed.bc
-    COMMAND time klee --only-output-states-covering-new llvm_stuffed.bc
-    DEPENDS llvm_stuffed.bc
+    COMMAND time klee --only-output-states-covering-new testbench_plic
+    DEPENDS testbench_plic
 )
 
 add_custom_target(run_klee_tests_with_instructions
-    COMMAND time klee --debug-print-instructions=src:file llvm_stuffed.bc
-    DEPENDS llvm_stuffed.bc
+    COMMAND time klee --debug-print-instructions=src:file testbench_plic
+    DEPENDS testbench_plic
 )
-
-
-# clang -flto -std=c++14 -stdlib=libc++ ./CMakeFiles/testbench_plic_llvm.dir/main.cpp.o ./sim/CMakeFiles/sim_llvm.dir/sysc/kernel/sc_time.cpp.o ./sim/CMakeFiles/sim_llvm.dir/tlm_utils/simple_target_socket.cpp.o ./sim/CMakeFiles/sim_llvm.dir/registry.cpp.o ./bench/CMakeFiles/bench_llvm.dir/plic.cpp.o -o testbench_plic_llvm
-#language llvm bytecode?

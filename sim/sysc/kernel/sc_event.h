@@ -21,6 +21,7 @@ public:
 	//notify for use in benchmark to require a certain reaction
     void notify(const sc_time& time);
     //sc_time getWaketime();
+    void cancel();
 };
 
 

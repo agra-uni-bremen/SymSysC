@@ -9,11 +9,13 @@
 
 #include <functional>
 #include <vector>
-#include <queue>
+#include <set>
+#include <algorithm> // find_if
 #include <assert.h>
 #include <tlm_core/tlm_2/tlm_generic_payload/tlm_gp.h>
 #include <sysc/kernel/sc_time.h>
 #include <klee_conf.h>
+
 
 namespace sc_core
 {
@@ -25,11 +27,10 @@ typedef void Process(void);
 
 class Simcontext
 {
-    //TODO: Prio-queue got Threads
     typedef std::pair<sc_time, std::function<Thread>*> Wakelist;
     std::vector<std::function<Thread>> threads;
     std::vector<std::function<Process>> processes;
-    std::priority_queue<Wakelist, std::vector<Wakelist>, std::greater<Wakelist>> wakelist;
+    std::set<Wakelist> wakelist;
 
     sc_time global_time;
 
@@ -55,7 +56,7 @@ public:
 
     void addThread(std::function<Thread> t) {
         threads.push_back(t);
-        wakelist.push(Wakelist{sc_time(0, SC_MS), &threads[threads.size()-1]});
+        wakelist.insert(Wakelist{sc_time(0, SC_MS), &threads[threads.size()-1]});
     }
 
     void addProcess(std::function<Process> p) {
@@ -65,12 +66,21 @@ public:
     void addWaketime(std::function<Thread>* thread, const sc_core::sc_time& time)
     {
         assert(thread != nullptr && "add Waketime with invalid active Thread!");
-        wakelist.push(Wakelist{time, thread});
+        wakelist.insert(Wakelist{time, thread});
     }
 
     void addWaketime(const sc_core::sc_time& time)
     {
         addWaketime(activeThread, time);
+    }
+
+    void removeWaketime(std::function<Thread>* thread)
+    {
+		auto it = std::find_if(wakelist.cbegin(), wakelist.cend(),
+			[&](const Wakelist& val) -> bool {
+				return val.second == thread;
+			});
+		wakelist.erase(it);
     }
 
     void runNextStep()
@@ -81,15 +91,16 @@ public:
             return;
         }
 
-        assert(wakelist.top().first >= global_time && "Next wake event lies in the past!");
-        global_time = wakelist.top().first;
+        assert(wakelist.cbegin()->first >= global_time && "Next wake event lies in the past!");
+        global_time = wakelist.cbegin()->first;
 
         INFO(std::cout << "Running threads at " << global_time.to_string() << std::endl);
 
-        while(!wakelist.empty() && wakelist.top().first == global_time)
+        while(!wakelist.empty() && wakelist.cbegin()->first == global_time)
         {
-            activeThread = wakelist.top().second;
-            wakelist.pop();
+            auto top = wakelist.cbegin();
+            activeThread = top->second;
+            wakelist.erase(top);
             (*activeThread)();
 
         }
