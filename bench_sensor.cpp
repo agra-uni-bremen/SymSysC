@@ -38,7 +38,7 @@ int main()
     pl.set_read();
     pl.set_address(address);
     pl.set_data_length(length);
-    uint8_t buffer[length];
+    uint8_t* buffer = new uint8_t[INT32_MAX];
     pl.set_data_ptr(buffer);
 
     dut.transport(pl, delay);
