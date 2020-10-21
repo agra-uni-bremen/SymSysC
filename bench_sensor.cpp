@@ -34,9 +34,8 @@ int main()
     tlm::tlm_generic_payload pl;
     uint32_t address = klee_int("address");
     uint32_t length = klee_int("length");
-    const uint32_t max_len = 100;
-    //FIXME: When address is not limited, klee takes forever
-    klee_assume(address <= max_len);
+    const uint32_t max_len = 1000;
+
     klee_assume(length <= max_len);
     pl.set_read();
     pl.set_address(address);

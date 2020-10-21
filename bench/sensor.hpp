@@ -54,8 +54,8 @@ struct SimpleSensor : public sc_core::sc_module {
 		} else {
 			assert(len == 4 && "only allow to read/write whole register");
 
-			//intentional bug: wrong offset calculation
-			assert(addr <= 1 + offsetof(union Memory, filter) && "access to non-mapped address");
+			//intentional bug: not taking + len into account
+			assert(addr <= offsetof(union Memory, filter) && "access to non-mapped address");
 
 			// trigger pre read/write actions
 			if (cmd == tlm::TLM_WRITE_COMMAND) {
