@@ -4,7 +4,8 @@ set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g3")
+# "-fsanitize=memory -fsanitize-memory-track-origins=2 -fno-omit-frame-pointer"
+set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O1")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 
