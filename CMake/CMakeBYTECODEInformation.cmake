@@ -6,7 +6,7 @@ set(CMAKE_BYTECODE_COMPILER
 set(CMAKE_BYTECODE_SOURCE_FILE_EXTENSIONS cpp)
 set(CMAKE_BYTECODE_OUTPUT_EXTENSION .bc)
 set(CMAKE_BYTECODE_FLAGS 
-	"-DUSE_KLEE -std=gnu++14 -emit-llvm -flto -c -Xclang -disable-O0-optnone"
+	"-DUSE_KLEE -stdlib=libc++ -std=c++14 -emit-llvm -flto -c -Xclang -disable-O0-optnone"
 )
 set(CMAKE_BYTECODE_FLAGS_DEBUG "-g3")
 set(CMAKE_BYTECODE_FLAGS_RELEASE "-O3")

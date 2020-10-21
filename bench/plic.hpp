@@ -4,7 +4,7 @@
 #include <systemc>
 #include "core/common/irq_if.h"
 #include "util/tlm_map.h"
-
+#include <array>
 #include <stdint.h>
 
 template <unsigned NumberCores, unsigned NumberInterrupts, uint32_t MaxPriority>
