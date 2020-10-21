@@ -45,9 +45,8 @@ int main()
 
     dut.transport(pl, delay);
 
-
-
 	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
 
+	delete[] buffer;
 	return 0;
 }
