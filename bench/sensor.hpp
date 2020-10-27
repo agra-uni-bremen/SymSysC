@@ -123,7 +123,7 @@ HERE1:
 				}
 			}
 
-			// indentional bug: Interrupt 64 will not be fired
+			// intentional bug: Interrupt 64 will not be fired
 			if(irq_number != 64)
 				plic->gateway_trigger_interrupt(irq_number);
 		}

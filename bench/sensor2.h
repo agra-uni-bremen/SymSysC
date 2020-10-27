@@ -79,33 +79,33 @@ struct SimpleSensor2 : public sc_core::sc_module {
 	}
 
 	void run() {
-        // header--
-        enum class Label
-        {
-            init,
-            here1
-        };
+		// header--
+		enum class Label
+		{
+			init,
+			here1
+		};
 
-        static Label position = Label::init;
+		static Label position = Label::init;
 
-        switch (position)
-        {
-            case Label::here1:
-                goto HERE1;
-            default:
-                //nothing
-                break;
-        }
-        //INFO(std::cout << "run init" << std::endl);
-        // --header
+		switch (position)
+		{
+			case Label::here1:
+				goto HERE1;
+			default:
+				//nothing
+				break;
+		}
+		//INFO(std::cout << "run init" << std::endl);
+		// --header
 
 		while (true) {
 			run_event.notify(sc_core::sc_time(scaler, sc_core::SC_MS));
 
 			//INFO(std::cout << "run wait()" << std::endl);
-            sc_core::wait(run_event);  // 40 times per second by default
-            position = Label::here1;
-            return;
+			sc_core::wait(run_event);  // 40 times per second by default
+			position = Label::here1;
+			return;
 HERE1:
 
 			// fill with random data
@@ -120,7 +120,9 @@ HERE1:
 				}
 			}
 
-            plic->gateway_trigger_interrupt(irq_number);
+			// intentional bug: Interrupt 64 will not be fired
+			if(irq_number != 64)
+				plic->gateway_trigger_interrupt(irq_number);
 		}
 	}
 };
