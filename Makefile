@@ -5,6 +5,8 @@ ifeq (, $(shell which podman))
  container_prog:= docker
 endif
 
+default: native
+
 all: native bytecode
 
 build/:

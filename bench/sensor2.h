@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <array>
 #include <systemc>
 
 #include "core/common/irq_if.h"
@@ -78,9 +79,34 @@ struct SimpleSensor2 : public sc_core::sc_module {
 	}
 
 	void run() {
+        // header--
+        enum class Label
+        {
+            init,
+            here1
+        };
+
+        static Label position = Label::init;
+
+        switch (position)
+        {
+            case Label::here1:
+                goto HERE1;
+            default:
+                //nothing
+                break;
+        }
+        //INFO(std::cout << "run init" << std::endl);
+        // --header
+
 		while (true) {
 			run_event.notify(sc_core::sc_time(scaler, sc_core::SC_MS));
-			sc_core::wait(run_event);  // 40 times per second by default
+
+			//INFO(std::cout << "run wait()" << std::endl);
+            sc_core::wait(run_event);  // 40 times per second by default
+            position = Label::here1;
+            return;
+HERE1:
 
 			// fill with random data
 			for (auto &n : data_frame) {

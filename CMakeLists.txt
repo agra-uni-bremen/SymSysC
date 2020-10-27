@@ -39,16 +39,26 @@ add_executable(testbench_sensor
 )
 target_link_libraries(testbench_sensor sim bench)
 
+add_executable(testbench_sensor2
+        bench_sensor2.cpp
+)
+target_link_libraries(testbench_sensor2 sim bench)
 
-add_custom_target(run_plic_tests
+
+add_custom_target(test_plic
     #COMMAND time klee --libcxx --libc=uclibc -posix-runtime llvm_stuffed.bc
     COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_plic
     DEPENDS testbench_plic
 )
 
-add_custom_target(run_sensor_tests
+add_custom_target(test_sensor
     COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_sensor
     DEPENDS testbench_sensor
+)
+
+add_custom_target(test_sensor2
+    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_sensor2
+    DEPENDS testbench_sensor2
 )
 
 add_custom_target(run_klee_tests_with_instructions
