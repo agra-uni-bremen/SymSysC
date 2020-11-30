@@ -7,10 +7,19 @@ Think of concrete testbenches
 
 (nice to have: standard assertions (no crash, memory leak, ..))
 
+Hashmap ersetzen durch normale map
+UART, Sensor2 mit register range
+
 klee/angr comparison?
 	Kosten / Nutzen?
 
 Hierachical waits in called functions?
+
+Systemc basierte Metriken, automatisch herausfinden?
+    Coverage?
+
+Laufzeit messen, Sinvolle Tests schreiben.
+    Eigenschaften definieren und dagegen testen (Beispieleigenschaften aus 2016 Datepaper)
 
 --------------------------------------------------------------------------
 |   Path    |  Instrs|  Time(s)|  ICov(%)|  BCov(%)|  ICount|  TSolver(%)|
