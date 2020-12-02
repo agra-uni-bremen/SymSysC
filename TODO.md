@@ -22,7 +22,7 @@ Laufzeit messen, Sinvolle Tests schreiben.
     Eigenschaften definieren und dagegen testen (Beispieleigenschaften aus 2016 Datepaper)
     
     
-
+Erste Erkenntnis: Boost und Fremdlibs verzögern _extrem_ die Ausführung.
 
        | PLIC | SENSOR_bare | SENSOR_TLM_MAP
 --------------------------------------------

@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <deque>
+#include <unistd.h>		//STDIN_FILENO and others
 
 struct UART16550 : public sc_core::sc_module {
 	tlm_utils::simple_target_socket<UART16550> tsock;
@@ -49,7 +50,7 @@ struct UART16550 : public sc_core::sc_module {
 	void try_receive_char() {
 		if (rx_fifo.empty()) {
 			char c;
-			if (read(0, &c, 1) >= 0) {
+			if (read(0, &c, 1) >= 0) {		//TODO: Read symbolic values here?
 				rx_fifo.push_back(c);
 			}
 		}

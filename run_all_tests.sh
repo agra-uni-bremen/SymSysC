@@ -1,6 +1,6 @@
 #!/bin/bash
 buildfolder="build"
-tests=("test_sensor" "test_sensor2" "test_plic")
+tests=("test_sensor" "test_sensor2" "test_uart" "test_plic")
 today=$(date +"%Y-%m-%d.%H-%m")
 
 echo "Today is $today"

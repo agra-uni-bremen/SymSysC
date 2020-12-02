@@ -1,31 +1,15 @@
-#include "bench/uart.h"
+#include "bench/uart16550.h"
 #include "sim/registry.hpp"
 #include "sim/klee_conf.h"
 
 
-struct test_interrupt_gateway : interrupt_gateway{
-	uint32_t triggered_irq = 0;
-	void gateway_trigger_interrupt(uint32_t irq_id){
-		triggered_irq = irq_id;
-		INFO(std::cout << "interrupt " << irq_id << " fired." << std::endl;);
-	}
-};
-
-
 int main()
 {
-	UART dut("bernd");
-	test_interrupt_gateway tig;
-	dut.plic = &tig;
+	UART16550 dut("bernd");
 
 	INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
 	sc_core::Simcontext::get().printInfo();
 
-
-	minikernel_step();	// 0
-	minikernel_step();	// 40ms
-
-	assert(interrupt == tig.triggered_irq);
 
 	sc_core::sc_time delay;
     tlm::tlm_generic_payload pl;
