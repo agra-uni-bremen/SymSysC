@@ -12,8 +12,6 @@ struct test_interrupt_gateway : interrupt_gateway{
 };
 
 
-
-
 int main()
 {
 	uint32_t interrupt = klee_int("Interrupt");
