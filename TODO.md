@@ -21,15 +21,20 @@ Systemc basierte Metriken, automatisch herausfinden?
 Laufzeit messen, Sinvolle Tests schreiben.
     Eigenschaften definieren und dagegen testen (Beispieleigenschaften aus 2016 Datepaper)
     
-    
+
+PLIC Ausführungsgeschwindigkeit wo Probleme?
+
 Erste Erkenntnis: Boost und Fremdlibs verzögern _extrem_ die Ausführung.
 
-       | PLIC | SENSOR_bare | SENSOR_TLM_MAP
---------------------------------------------
-Faults  |   X   |            6  |          5
-Instr.  |   X   |      172.131  |    338.552
-Paths   |   X   |           70  |         80
-Time    |   X   |         4,23s |       5,54s
-I/s     |   X   |       40.692  |     61.105
+        |     PLIC     |  SENSOR_bare  |  SENSOR_TLM_MAP | UART
+-----------------------------------------------------------------
+Faults  |           4  |            6  |          5
+Instr.  |   3.533.345  |      172.131  |    338.552
+Paths   |          64  |           70  |         80
+Time    |       5.082s |         4,23s |       5,54s
+I/s     |         695  |       40.692  |     61.105
+
+Getrennte Tabellen für jede Testbench.
+    -> Fehlergruppen for jede TB
 
 --> Complete Path exploration time!
