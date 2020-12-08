@@ -88,7 +88,7 @@ struct UART16550 : public sc_core::sc_module {
 				if (data == 0)
 					return;
 			}
-			std::cout << static_cast<char>(data);
+			INFO(std::cout << static_cast<char>(data));
 			fflush(stdout);
 		}
 	}
