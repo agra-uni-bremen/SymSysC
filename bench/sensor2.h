@@ -111,7 +111,8 @@ HERE1:
 			// fill with random data
 			for (auto &n : data_frame) {
 				if (filter == 1) {
-					n = rand() % 10 + 48;
+					//n = rand() % 10 + 48;
+					n = rand() % 10 + 50;	//"overflow", randomly producing wrong values
 				} else if (filter == 2) {
 					n = rand() % 26 + 65;
 				} else {

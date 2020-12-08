@@ -36,5 +36,11 @@ I/s     |         695  |       40.692  |     61.105
 
 Getrennte Tabellen für jede Testbench.
     -> Fehlergruppen for jede TB
+        -> Robustness (interface)
+        -> Memory-Fehler
+        -> Off-by-one
+        -> Whitebox: Erwartete Werte
+            -> Prio richtig?
+            -> Interrupt auch claim-bar?
 
---> Complete Path exploration time!
+Complete Path exploration time!

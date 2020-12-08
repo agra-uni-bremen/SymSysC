@@ -25,7 +25,7 @@ int main()
 
 	minikernel_step();	// 0
 	minikernel_step();	// 40ms
-
+	//Test 1
 	assert(interrupt == tig.triggered_irq);
 
 	sc_core::sc_time delay;
@@ -40,11 +40,21 @@ int main()
     pl.set_data_length(length);
     uint8_t* buffer = new uint8_t[max_len];
     pl.set_data_ptr(buffer);
-
+    //Test 2
     dut.transport(pl, delay);
 
-	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
+    minikernel_step();	// 80ms
 
+    //Test 3
+    pl.set_read();
+    pl.set_address(0);
+    pl.set_data_length(1);
+    uint8_t rand_value;
+    pl.set_data_ptr(&rand_value);
+    dut.transport(pl, delay);
+
+    assert(rand_value > 48);	// In default filter, values shall range in
+    assert(rand_value < 58);	// 48 + rand() % 10
 	delete[] buffer;
 	return 0;
 }
