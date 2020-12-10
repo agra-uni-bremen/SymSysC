@@ -76,7 +76,9 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 	void gateway_trigger_interrupt(uint32_t irq_id) {
 		// NOTE: can use different techniques for each gateway, in this case a
 		// simple non queued edge trigger
-		assert(irq_id > 0 && irq_id < NumberInterrupts);
+
+		//BUG: Shall be < NumInterrupts
+		assert(irq_id > 0 && irq_id <= NumberInterrupts);
 		// std::cout << "[vp::plic] incoming interrupt " << irq_id << std::endl;
 
 		unsigned idx = irq_id / 32;
@@ -91,7 +93,7 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 
 	void clear_pending_interrupt(unsigned irq_id) {
-		assert(irq_id >= 0 && irq_id < NumberInterrupts);  //NOTE: ignore clear of zero interrupt (zero is not available)
+		assert(irq_id >= 0 && irq_id < NumberInterrupts);//NOTE: ignore clear of zero interrupt (zero is not available)
 		INFO(std::cout << "[vp::plic] clear pending interrupt " << irq_id << std::endl);
 
 		// Intentional bug

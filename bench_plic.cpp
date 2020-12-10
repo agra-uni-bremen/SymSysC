@@ -84,6 +84,7 @@ int main()
 
     //the step should trigger an external interrupt
     assert(sit.was_triggered);
+    assert(sc_core::Simcontext::get().getGlobalTime() < sc_core::sc_time(50, sc_core::SC_MS));
 
     sit.claim_interrupt();
 
