@@ -30,8 +30,8 @@ int main()
 
 	sc_core::sc_time delay;
     tlm::tlm_generic_payload pl;
-    uint32_t address = klee_int("address");
-    uint32_t length = klee_int("length");
+    uint32_t address = klee_int("address_read");
+    uint32_t length = klee_int("length_read");
     const uint32_t max_len = 1000;
 
     klee_assume(length <= max_len);
@@ -40,12 +40,13 @@ int main()
     pl.set_data_length(length);
     uint8_t* buffer = new uint8_t[max_len];
     pl.set_data_ptr(buffer);
-    //Test 2: Read at any address for any given length
+    // Test 2: Read at any address for any given length.
+    // Is there any unexpected output?
     dut.transport(pl, delay);
 
     minikernel_step();	// 80ms
 
-    //Test 3
+    //Test 3: Are returned values in specification?
     pl.set_read();
     pl.set_address(0);
     pl.set_data_length(1);
@@ -56,6 +57,16 @@ int main()
     assert(rand_value > 48);	// In default filter, values shall range in
     assert(rand_value < 58);	// 48 + rand() % 10
 
+    // Test 4: Write at any address.
+    // Is there any unexpected output?
+    address = klee_int("address_write");
+    pl.set_write();
+    pl.set_address(address);
+    pl.set_data_length(4);
+    uint8_t write[4];
+    klee_make_symbolic(write, 4, "write data");
+    pl.set_data_ptr(write);
+    dut.transport(pl, delay);
 
 	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
 
