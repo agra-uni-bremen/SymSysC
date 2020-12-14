@@ -51,6 +51,7 @@ struct Simple_interrupt_target : public external_interrupt_target
 
 int main()
 {
+	//Test info output
     sc_core::sc_time a(1002, sc_core::SC_MS), b (1, sc_core::SC_SEC), c (1, sc_core::SC_FS);
     INFO(std::cout << a.to_string() << " + " << b.to_string() << " = " << (a+b).to_string() << std::endl);
     INFO(std::cout << c.to_string() << " in default units is " << c.to_default_time_units() << " " << sc_core::unit_to_string(sc_core::default_time_unit) << std::endl);
@@ -66,7 +67,7 @@ int main()
 	INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
 	sc_core::Simcontext::get().printInfo();
 
-	minikernel_step();
+	minikernel_step();	//0ms
 
 	uint32_t i = klee_int("i interrupt number");
 
@@ -80,33 +81,17 @@ int main()
     else
         assert(dut.pending_interrupts[1] > 0);
 
-    minikernel_step();
+    minikernel_step();	// 40ms?
 
     //the step should trigger an external interrupt
     assert(sit.was_triggered);
-    assert(sc_core::Simcontext::get().getGlobalTime() < sc_core::sc_time(50, sc_core::SC_MS));
+    // was PLIC fast enough?
+    assert(sc_core::Simcontext::get().getGlobalTime() <= sc_core::sc_time(10, sc_core::SC_NS));
 
     sit.claim_interrupt();
 
     //The pending interrupt register should be cleared after claim
     assert(dut.pending_interrupts[0] == 0 && dut.pending_interrupts[1] == 0);
-
-    return 0;
-
-    sit.was_triggered = false;
-
-    uint32_t j = 2; //klee_int("j interrupt number");
-
-    dut.gateway_trigger_interrupt(j);
-    minikernel_step();
-    if(j < 32)
-        assert(dut.pending_interrupts[0] > 0);
-    else
-        assert(dut.pending_interrupts[1] > 0);
-    assert(!sit.was_triggered);
-
-	minikernel_step();
-	minikernel_step(); //just for fun
 
 	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
 

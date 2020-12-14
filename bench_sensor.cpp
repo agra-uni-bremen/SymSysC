@@ -25,7 +25,7 @@ int main()
 
 	minikernel_step();	// 0
 	minikernel_step();	// 40ms
-	//Test 1
+	//Test 1: Is triggered interrupt correct?
 	assert(interrupt == tig.triggered_irq);
 
 	sc_core::sc_time delay;
@@ -40,7 +40,7 @@ int main()
     pl.set_data_length(length);
     uint8_t* buffer = new uint8_t[max_len];
     pl.set_data_ptr(buffer);
-    //Test 2
+    //Test 2: Read at any address for any given length
     dut.transport(pl, delay);
 
     minikernel_step();	// 80ms

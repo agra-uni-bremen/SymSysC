@@ -44,3 +44,6 @@ Getrennte Tabellen für jede Testbench.
             -> Interrupt auch claim-bar?
 
 Complete Path exploration time!
+
+
+Error handling, Specification testing, Functional testing

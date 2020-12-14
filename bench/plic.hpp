@@ -87,8 +87,17 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 		pending_interrupts[idx] |= 1 << off;
 
 		//intentional bug
-		if(irq_id != 13)
-		    e_run.notify(clock_cycle);
+		if(irq_id == 13)
+			return;
+
+
+		if(irq_id > 32) {
+			// Intentional bug: irq > 32 is slower than specified
+			e_run.notify(2*clock_cycle);
+			return;
+		}
+
+		e_run.notify(clock_cycle);
 	}
 
 

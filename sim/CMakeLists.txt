@@ -4,6 +4,6 @@ file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_library(sim
 		${SOURCES}
-        ${HEADERS}
+        ${HEADERS} systemc
 )
 target_include_directories(sim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
