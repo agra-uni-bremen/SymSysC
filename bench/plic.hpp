@@ -93,6 +93,7 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 		if(irq_id > 32) {
 			// Intentional bug: irq > 32 is slower than specified
+			// Note: produces float calc because of "2*"
 			e_run.notify(2*clock_cycle);
 			return;
 		}
