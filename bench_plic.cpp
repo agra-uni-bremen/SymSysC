@@ -81,12 +81,12 @@ int main()
     else
         assert(dut.pending_interrupts[1] > 0);
 
-    minikernel_step();	// 40ms?
+    minikernel_step();	// should be 10ns
+    // was PLIC fast enough?
+    assert(sc_core::Simcontext::get().getGlobalTime() == sc_core::sc_time(10, sc_core::SC_NS));
 
     //the step should trigger an external interrupt
     assert(sit.was_triggered);
-    // was PLIC fast enough?
-    assert(sc_core::Simcontext::get().getGlobalTime() <= sc_core::sc_time(10, sc_core::SC_NS));
 
     sit.claim_interrupt();
 
