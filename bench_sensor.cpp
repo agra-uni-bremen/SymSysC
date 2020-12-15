@@ -34,6 +34,7 @@ int main()
     uint32_t length = klee_int("length_read");
     const uint32_t max_len = 1000;
 
+    // limit possible length
     klee_assume(length <= max_len);
     pl.set_read();
     pl.set_address(address);
@@ -59,9 +60,8 @@ int main()
 
     // Test 4: Write at any address.
     // Is there any unexpected output?
-    address = klee_int("address_write");
     pl.set_write();
-    pl.set_address(address);
+    pl.set_address(klee_int("address_write"));
     pl.set_data_length(4);
     uint8_t write[4];
     klee_make_symbolic(write, 4, "write data");
