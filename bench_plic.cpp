@@ -48,27 +48,8 @@ struct Simple_interrupt_target : public external_interrupt_target
     }
 };
 
-
-int main()
+void functional_test(PLIC<1, numberInterrupts, maxPriority>& dut, Simple_interrupt_target& sit)
 {
-	//Test info output
-    sc_core::sc_time a(1002, sc_core::SC_MS), b (1, sc_core::SC_SEC), c (1, sc_core::SC_FS);
-    INFO(std::cout << a.to_string() << " + " << b.to_string() << " = " << (a+b).to_string() << std::endl);
-    INFO(std::cout << c.to_string() << " in default units is " << c.to_default_time_units() << " " << sc_core::unit_to_string(sc_core::default_time_unit) << std::endl);
-
-
-	PLIC<1, numberInterrupts, maxPriority> dut("DUT");
-    Simple_interrupt_target sit(dut);
-
-	//interrupt line plic -> sit
-	dut.target_harts[0] = &sit;
-
-
-	INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
-	sc_core::Simcontext::get().printInfo();
-
-	minikernel_step();	//0ms
-
 	uint32_t i = klee_int("i interrupt number");
 
 	klee_assume(i < numberInterrupts);
@@ -81,17 +62,82 @@ int main()
     else
         assert(dut.pending_interrupts[1] > 0);
 
+    auto before = sc_core::Simcontext::get().getGlobalTime();
     minikernel_step();	// should be 10ns
     // was PLIC fast enough?
-    assert(sc_core::Simcontext::get().getGlobalTime() == sc_core::sc_time(10, sc_core::SC_NS));
+    auto after = sc_core::Simcontext::get().getGlobalTime();
+    assert(after-before == sc_core::sc_time(10, sc_core::SC_NS));
 
     //the step should trigger an external interrupt
     assert(sit.was_triggered);
 
+    // Is correct Interrupt claimable?
     sit.claim_interrupt();
 
     //The pending interrupt register should be cleared after claim
     assert(dut.pending_interrupts[0] == 0 && dut.pending_interrupts[1] == 0);
+}
+
+
+void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut)
+{
+	unsigned constexpr max_data_length = 1000;
+	unsigned data_length = klee_int("data_length");
+	klee_assume(data_length <= max_data_length);
+	uint8_t data[max_data_length];
+    sc_core::sc_time delay;
+    tlm::tlm_generic_payload pl;
+    pl.set_read();
+    pl.set_address(klee_int("address"));   //claim_response register
+    pl.set_data_length(data_length);
+    pl.set_data_ptr(data);
+
+    dut.transport(pl, delay);
+}
+
+
+int main(int argc, char* argv[])
+{
+	PLIC<1, numberInterrupts, maxPriority> dut("DUT");
+    Simple_interrupt_target sit(dut);
+	//interrupt line plic -> sit
+	dut.target_harts[0] = &sit;
+
+
+
+	unsigned test = 0;
+	if(argc == 2)
+	{
+		switch(argv[1][0])
+		{
+		//fall-through
+		case '5': test++;
+		case '4': test++;
+		case '3': test++;
+		case '2': test++;
+		case '1': test++;
+		case '0': break;
+		default:
+			INFO(std::cout << "Invalid testnumber given. Running all (0) benches" << std::endl);
+		}
+	} else
+	{
+		INFO(std::cout << "No testnumber given. Running all (0) benches" << std::endl);
+		//Test info output
+	    sc_core::sc_time a(1002, sc_core::SC_MS), b (1, sc_core::SC_SEC), c (1, sc_core::SC_FS);
+	    INFO(std::cout << a.to_string() << " + " << b.to_string() << " = " << (a+b).to_string() << std::endl);
+	    INFO(std::cout << c.to_string() << " in default units is " << c.to_default_time_units() << " " << sc_core::unit_to_string(sc_core::default_time_unit) << std::endl);
+		INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
+		sc_core::Simcontext::get().printInfo();
+	}
+
+
+	minikernel_step();	//0ms
+
+	if(test == 1 || test == 0)
+		functional_test(dut, sit);
+	if(test == 2 || test == 0)
+		interface_test(dut);
 
 	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
 
