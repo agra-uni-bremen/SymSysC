@@ -46,4 +46,13 @@ Getrennte Tabellen für jede Testbench.
 Complete Path exploration time!
 
 
-Error handling, Specification testing, Functional testing
+Error handling (generic values as input, watch behaviour),
+Functional testing
+Fault injection vs Correctness, how?
+
+Testbenches einzeln, und mit/ohne Fehler, Zeitdifferenz
+
+tb | F1 | F2 | F3 | time, paths
+T1 | x  | -  |  - | 400s, 70 paths
+T2 |
+T3 |
