@@ -122,11 +122,11 @@ int main(int argc, char* argv[])
 		}
 	} else
 	{
-		std::cout << "No testnumber given. Running all (0) benches" << std::endl;
+		INFO(std::cout << "No testnumber given. Running all (0) benches" << std::endl);
 		//Test info output
-	    sc_core::sc_time a(1002, sc_core::SC_MS), b (1, sc_core::SC_SEC), c (1, sc_core::SC_FS);
-	    INFO(std::cout << a.to_string() << " + " << b.to_string() << " = " << (a+b).to_string() << std::endl);
-	    INFO(std::cout << c.to_string() << " in default units is " << c.to_default_time_units() << " " << sc_core::unit_to_string(sc_core::default_time_unit) << std::endl);
+		sc_core::sc_time a(1002, sc_core::SC_MS), b (1, sc_core::SC_SEC), c (1, sc_core::SC_FS);
+		INFO(std::cout << a.to_string() << " + " << b.to_string() << " = " << (a+b).to_string() << std::endl);
+		INFO(std::cout << c.to_string() << " in default units is " << c.to_default_time_units() << " " << sc_core::unit_to_string(sc_core::default_time_unit) << std::endl);
 		INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
 		sc_core::Simcontext::get().printInfo();
 	}
