@@ -11,6 +11,6 @@ BEGIN {
 
 END {
     for (file in files) {
-        printf("file: %s → %s\n", file, files[file])
+        printf("%s: %s\n", files[file], file)
     }
 }
