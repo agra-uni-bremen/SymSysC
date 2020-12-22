@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 #include <cstring>
-
+#include <stddef.h>
 #include <systemc>
 
 #include <tlm_utils/simple_target_socket.h>
