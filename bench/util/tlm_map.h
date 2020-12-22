@@ -3,7 +3,7 @@
 
 
 #include <functional>
-#include <unordered_map>
+#include <map>
 #include <string.h>
 #include <assert.h>
 #include <systemc>
@@ -143,16 +143,7 @@ struct RegisterMapping : public AbstractMapping {
 	typedef std::function<void()> callback_t;
 	typedef std::function<void(const register_access_t &)> handler_t;
 
-	class NixHash
-	{
-	public:
-	    std::size_t operator()(uint64_t const& s) const
-	    {
-	        return s;
-	    }
-	};
-
-	std::unordered_map<uint64_t, reg_mapping_t, NixHash> addr_to_reg;
+	std::map<uint64_t, reg_mapping_t> addr_to_reg;
 	handler_t handler;
 
 	RegisterMapping &add_register(reg_mapping_t m) {
