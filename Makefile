@@ -35,6 +35,9 @@ clean-bytecode:
 clean: clean-native clean-bytecode
 
 docker-build:
+	echo "if problems occur, execute"
+	echo "sudo mkdir /sys/fs/cgroup/systemd"
+	echo "sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd"
 	$(container_prog) build --tag klee-more:1.0 . 
 
 docker:			#todo: check if docker image exists

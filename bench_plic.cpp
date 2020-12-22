@@ -88,7 +88,7 @@ void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut)
     sc_core::sc_time delay;
     tlm::tlm_generic_payload pl;
     pl.set_read();
-    pl.set_address(klee_int("address"));   //claim_response register
+    pl.set_address(klee_int("address"));
     pl.set_data_length(data_length);
     pl.set_data_ptr(data);
 
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
 		}
 	} else
 	{
-		INFO(std::cout << "No testnumber given. Running all (0) benches" << std::endl);
+		std::cout << "No testnumber given. Running all (0) benches" << std::endl;
 		//Test info output
 	    sc_core::sc_time a(1002, sc_core::SC_MS), b (1, sc_core::SC_SEC), c (1, sc_core::SC_FS);
 	    INFO(std::cout << a.to_string() << " + " << b.to_string() << " = " << (a+b).to_string() << std::endl);
