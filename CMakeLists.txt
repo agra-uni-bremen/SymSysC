@@ -49,29 +49,29 @@ add_executable(testbench_uart
 )
 target_link_libraries(testbench_uart sim bench)
 
+set(KLEE_ARGS "-emit-all-errors --optimize --libcxx --libc=uclibc -posix-runtime ")
 
 add_custom_target(test_plic
-    #COMMAND time klee --libcxx --libc=uclibc -posix-runtime llvm_stuffed.bc
-    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_plic
+    COMMAND time klee ${KLEE_ARGS} testbench_plic
     DEPENDS testbench_plic
 )
 
 add_custom_target(test_sensor
-    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_sensor
+    COMMAND time klee ${KLEE_ARGS} testbench_sensor
     DEPENDS testbench_sensor
 )
 
 add_custom_target(test_sensor2
-    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_sensor2
+    COMMAND time klee ${KLEE_ARGS} testbench_sensor2
     DEPENDS testbench_sensor2
 )
 
 add_custom_target(test_uart
-    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_sensor2
+    COMMAND time klee ${KLEE_ARGS} testbench_sensor2
     DEPENDS testbench_uart
 )
 
 add_custom_target(run_klee_tests_with_instructions
-    COMMAND time klee --debug-print-instructions=src:file testbench_plic
+    COMMAND time klee ${KLEE_ARGS} --debug-print-instructions=src:file testbench_plic
     DEPENDS testbench_plic
 )
