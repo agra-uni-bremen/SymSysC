@@ -52,22 +52,22 @@ target_link_libraries(testbench_uart sim bench)
 
 add_custom_target(test_plic
     #COMMAND time klee --libcxx --libc=uclibc -posix-runtime llvm_stuffed.bc
-    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_plic
+    COMMAND time klee --libcxx --libc=uclibc -posix-runtime testbench_plic
     DEPENDS testbench_plic
 )
 
 add_custom_target(test_sensor
-    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_sensor
+    COMMAND time klee --libcxx --libc=uclibc -posix-runtime testbench_sensor
     DEPENDS testbench_sensor
 )
 
 add_custom_target(test_sensor2
-    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_sensor2
+    COMMAND time klee --libcxx --libc=uclibc -posix-runtime testbench_sensor2
     DEPENDS testbench_sensor2
 )
 
 add_custom_target(test_uart
-    COMMAND time klee --only-output-states-covering-new --libcxx --libc=uclibc -posix-runtime testbench_sensor2
+    COMMAND time klee --libcxx --libc=uclibc -posix-runtime testbench_sensor2
     DEPENDS testbench_uart
 )
 
