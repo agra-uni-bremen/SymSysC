@@ -49,10 +49,10 @@ add_executable(testbench_uart
 )
 target_link_libraries(testbench_uart sim bench)
 
-set(KLEE_ARGS "-emit-all-errors --optimize --libcxx --libc=uclibc -posix-runtime ")
+set(KLEE_ARGS "--emit-all-errors=1" "--libcxx" "--libc=uclibc" "-posix-runtime")
 
 add_custom_target(test_plic
-    COMMAND time klee ${KLEE_ARGS} testbench_plic
+    COMMAND time klee ${KLEE_ARGS} testbench_plic 0
     DEPENDS testbench_plic
 )
 
