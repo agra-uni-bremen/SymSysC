@@ -79,20 +79,27 @@ void functional_test(PLIC<1, numberInterrupts, maxPriority>& dut, Simple_interru
 }
 
 
-void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut)
+void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_write)
 {
 	unsigned constexpr max_data_length = 1000;
 	unsigned data_length = klee_int("data_length");
 	klee_assume(data_length <= max_data_length);
 	uint8_t data[max_data_length];
-    sc_core::sc_time delay;
-    tlm::tlm_generic_payload pl;
-    pl.set_read();
-    pl.set_address(klee_int("address"));
-    pl.set_data_length(data_length);
-    pl.set_data_ptr(data);
+	sc_core::sc_time delay;
+	tlm::tlm_generic_payload pl;
+	pl.set_address(klee_int("address"));
+	pl.set_data_length(data_length);
+	pl.set_data_ptr(data);
+	if(read_or_write)
+		pl.set_read();
+	else {
+		p1.set_write();
+		klee_make_symbolic(data, data_length, "write data");
+	}
 
-    dut.transport(pl, delay);
+	dut.transport(pl, delay);
+
+	minikernel_step();
 }
 
 int main(int argc, char* argv[])
@@ -136,7 +143,9 @@ int main(int argc, char* argv[])
 	if(test == 1 || test == 0)
 		functional_test(dut, sit);
 	if(test == 2 || test == 0)
-		interface_test(dut);
+		interface_test(dut, false);
+	if(test == 3 || test == 0)
+		interface_test(dut, true);
 
 	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
 
