@@ -13,7 +13,7 @@ echo "Today is $today"
 mkdir test 2> /dev/null
 #	rm -r "$testfolder/*" 2> /dev/null
 
-make -C $buildfolder clean
+make -s -C $buildfolder clean
 for test in ${tests[@]}
 do
 	base_name=$(echo $test | cut -d "#" -f1)
