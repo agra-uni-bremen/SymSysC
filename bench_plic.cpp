@@ -50,7 +50,7 @@ struct Simple_interrupt_target : public external_interrupt_target
 
 void functional_test(PLIC<1, numberInterrupts, maxPriority>& dut, Simple_interrupt_target& sit)
 {
-	uint32_t i = klee_int("i interrupt number");
+	uint32_t i = klee_int("interrupt number");
 
 	klee_assume(i < numberInterrupts);
 
@@ -94,7 +94,6 @@ void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut)
 
     dut.transport(pl, delay);
 }
-
 
 int main(int argc, char* argv[])
 {

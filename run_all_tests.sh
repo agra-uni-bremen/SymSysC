@@ -21,8 +21,11 @@ do
 	testfolder=test/$test
 	echo "Running test $base_name ($subtype)"
 	mkdir "$testfolder" 2> /dev/null
-	make -C $buildfolder testbench_$base_name
+	make -C $buildfolder testbench_$base_name --no-print-directory
 	{ time klee ${klee_args[*]} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/$today.log" 2>&1
 	mkdir "$testfolder/$today"
 	cp -rL $buildfolder/klee-last/* "$testfolder/$today"
 done
+stats=$(klee-stats test/*/$today)
+echo $stats
+echo $stats > $today.klee-stat.log
