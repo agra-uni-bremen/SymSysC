@@ -90,10 +90,10 @@ void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_wr
 	pl.set_address(klee_int("address"));
 	pl.set_data_length(data_length);
 	pl.set_data_ptr(data);
-	if(read_or_write)
+	if(read_or_write) {
 		pl.set_read();
-	else {
-		p1.set_write();
+	} else {
+		pl.set_write();
 		klee_make_symbolic(data, data_length, "write data");
 	}
 
