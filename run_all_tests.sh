@@ -27,4 +27,6 @@ do
 	cp -rL $buildfolder/klee-last/* "$testfolder/$today"
 done
 klee-stats test/*/$today > test/$today.klee-stat.log
+tail test/*/$today.log >> test/$today.klee-stat.log
+
 cat test/$today.klee-stat.log
