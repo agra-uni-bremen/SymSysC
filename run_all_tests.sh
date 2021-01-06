@@ -26,6 +26,5 @@ do
 	mkdir "$testfolder/$today"
 	cp -rL $buildfolder/klee-last/* "$testfolder/$today"
 done
-stats=$(klee-stats test/*/$today)
-echo $stats
-echo $stats > $today.klee-stat.log
+klee-stats test/*/$today > test/$today.klee-stat.log
+cat test/$today.klee-stat.log

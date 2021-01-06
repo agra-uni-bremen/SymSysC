@@ -81,6 +81,8 @@ void functional_test(PLIC<1, numberInterrupts, maxPriority>& dut, Simple_interru
 
 void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_write)
 {
+	dut.gateway_trigger_interrupt(1);
+
 	unsigned constexpr max_data_length = 1000;
 	unsigned data_length = klee_int("data_length");
 	klee_assume(data_length <= max_data_length);
@@ -99,6 +101,7 @@ void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_wr
 
 	dut.transport(pl, delay);
 
+	minikernel_step();
 	minikernel_step();
 }
 
