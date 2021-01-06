@@ -57,7 +57,7 @@ set(KLEE_ARGS
 )
 
 add_custom_target(test_plic
-    COMMAND time klee ${KLEE_ARGS} testbench_plic 0
+    COMMAND time klee ${KLEE_ARGS} testbench_plic
     DEPENDS testbench_plic
 )
 
