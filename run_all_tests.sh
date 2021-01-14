@@ -26,7 +26,8 @@ do
 	make -C $buildfolder testbench_$base_name --no-print-directory
 	{ time klee ${klee_args[*]} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/run.log" 2>&1
 	mkdir "$testfolder/$today"
-	cp -rL $buildfolder/klee-last/* "$testfolder/$today"
+	current_klee_folder=$(readlink -f $buildfolder/klee-last)
+	mv "$current_klee_folder" "$testfolder/"
 done
 klee-stats $testfolder_base/* > $testfolder_base/klee-stat.log
 tail $testfolder_base/*/run.log >> $testfolder_base/klee-stat.log
