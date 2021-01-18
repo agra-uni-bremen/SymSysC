@@ -17,39 +17,45 @@ struct Simple_interrupt_target : public external_interrupt_target
     {
         INFO(std::cout << "Interrupt triggered" << std::endl);
         was_triggered = true;
+        was_cleared = false;
     };
 
     void clear_external_interrupt()
     {
         INFO(std::cout << "Interrupt cleared" << std::endl);
         was_cleared = true;
+        was_triggered = false;
     };
 
-    void claim_interrupt()
+    uint32_t claim_interrupt()
     {
-        if(was_triggered)
-        {
-            sc_core::sc_time delay;
-            tlm::tlm_generic_payload pl;
-            uint32_t interrupt = 0;
-            //0x200004 + n*8, &hart_claim_response[n]});
-            pl.set_read();
-            pl.set_address(0x200004);   //claim_response register
-            pl.set_data_length(sizeof(uint32_t));
-            pl.set_data_ptr(reinterpret_cast<unsigned char*>(&interrupt));
+        assert(was_triggered && "tried to claim untriggered interrupt target");
 
-            dut.transport(pl, delay);
+        sc_core::sc_time delay;
+		tlm::tlm_generic_payload pl;
+		uint32_t interrupt = 0;
+		//0x200004 + n*8, &hart_claim_response[n]});
+		pl.set_read();
+		pl.set_address(0x200004);   //claim_response register
+		pl.set_data_length(sizeof(uint32_t));
+		pl.set_data_ptr(reinterpret_cast<unsigned char*>(&interrupt));
 
-            //If the interrupt was triggered, there has to be an interrupt in register
-            assert(interrupt > 0);
+		dut.transport(pl, delay);
 
-            INFO(std::cout << "Interrupt " << interrupt << " claimed" << std::endl);
-        }
+		//If the interrupt was triggered, there has to be an interrupt in register
+		assert(interrupt > 0);
+
+		INFO(std::cout << "Interrupt " << interrupt << " claimed" << std::endl);
+		return interrupt;
     }
 };
 
-void functional_test(PLIC<1, numberInterrupts, maxPriority>& dut, Simple_interrupt_target& sit)
+void functional_test_basic(PLIC<1, numberInterrupts, maxPriority>& dut)
 {
+	Simple_interrupt_target sit(dut);
+	//interrupt line plic -> sit
+	dut.target_harts[0] = &sit;
+
 	uint32_t i = klee_int("interrupt number");
 
 	klee_assume(i < numberInterrupts);
@@ -74,10 +80,61 @@ void functional_test(PLIC<1, numberInterrupts, maxPriority>& dut, Simple_interru
     // Is correct Interrupt claimable?
     sit.claim_interrupt();
 
+    // was interrupt cleared by claiming?
+    assert(sit.was_cleared && "Interrupt was not cleared after claim");
+
     //The pending interrupt register should be cleared after claim
     assert(dut.pending_interrupts[0] == 0 && dut.pending_interrupts[1] == 0);
 }
 
+void functional_test_priority(PLIC<1, numberInterrupts, maxPriority>& dut)
+{
+	Simple_interrupt_target sit(dut);
+	//interrupt line plic -> sit
+	dut.target_harts[0] = &sit;
+
+
+	uint32_t i = klee_int("i interrupt");
+	uint32_t j = klee_int("j interrupt");
+
+	klee_assume(i < numberInterrupts && i > 0);	//ignore reserved zero interrupt
+	klee_assume(j < numberInterrupts && j > 0);
+
+	klee_assume(i != j);
+
+	uint32_t lower_itr = i < j ? i : j;
+	uint32_t highr_itr = i > j ? i : j;
+
+	dut.gateway_trigger_interrupt(i);
+	dut.gateway_trigger_interrupt(j);
+
+    minikernel_step();
+
+    //the step should trigger an external interrupt
+    assert(sit.was_triggered);
+
+    // Is correct Interrupt claimable?
+    uint32_t first_itr = sit.claim_interrupt();
+
+    //Was the itr with the highest prio (lowest val) chosen first?
+    assert(first_itr == lower_itr);
+
+    assert(sit.was_cleared && "Interrupt was not cleared after claim");
+
+    minikernel_step();
+
+    //the step should trigger an external interrupt
+    assert(sit.was_triggered);
+
+    // Is correct Interrupt claimable?
+    uint32_t second_itr = sit.claim_interrupt();
+
+    //Was the itr with the highest prio (lowest val) chosen first?
+    assert(second_itr == highr_itr);
+
+    assert(sit.was_cleared && "Interrupt was not cleared after claim");
+
+}
 
 void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_write)
 {
@@ -108,26 +165,16 @@ void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_wr
 int main(int argc, char* argv[])
 {
 	PLIC<1, numberInterrupts, maxPriority> dut("DUT");
-    Simple_interrupt_target sit(dut);
-	//interrupt line plic -> sit
-	dut.target_harts[0] = &sit;
-
-
 
 	unsigned test = 0;
 	if(argc == 2)
 	{
 		switch(argv[1][0])
 		{
-		//fall-through
-		case '5': test++;
-		case '4': test++;
-		case '3': test++;
-		case '2': test++;
-		case '1': test++;
-		case '0': break;
+		case '0' ... '9': test = argv[1][0] - '0';
+			break;
 		default:
-			INFO(std::cout << "Invalid testnumber given. Running all (0) benches" << std::endl);
+			INFO(std::cout << "Invalid testnumber given. Running all benches (argument 0)." << std::endl);
 		}
 	} else
 	{
@@ -143,12 +190,17 @@ int main(int argc, char* argv[])
 
 	minikernel_step();	//0ms
 
-	if(test == 1 || test == 0)
-		functional_test(dut, sit);
-	if(test == 2 || test == 0)
-		interface_test(dut, true);
-	if(test == 3 || test == 0)
+	unsigned shit = 0;
+	if(test == 0 || ++shit == test)
+		functional_test_basic(dut);
+	if(test == 0 || ++shit == test)
+		functional_test_priority(dut);
+	if(test == 0 || ++shit == test)
 		interface_test(dut, false);
+	if(test == 0 || ++shit == test)
+		interface_test(dut, true);
+
+
 
 	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
 
