@@ -146,7 +146,7 @@ void functional_test_priority(PLIC<1, numberInterrupts, maxPriority>& dut)
     		"Interrupt was not cleared after claim of last itr");
 }
 
-void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_write)
+void interface_test_read(PLIC<1, numberInterrupts, maxPriority>& dut)
 {
 	dut.gateway_trigger_interrupt(1);
 
@@ -156,21 +156,39 @@ void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_wr
 	uint8_t data[max_data_length];
 	sc_core::sc_time delay;
 	tlm::tlm_generic_payload pl;
+	pl.set_read();
 	pl.set_address(klee_int("address"));
 	pl.set_data_length(data_length);
 	pl.set_data_ptr(data);
-	if(read_or_write) {
-		pl.set_read();
-	} else {
-		pl.set_write();
-		klee_make_symbolic(data, data_length > 10 ? 10 : data_length, "write data");
-	}
 
 	dut.transport(pl, delay);
 
 	minikernel_step();
 	minikernel_step();
 }
+
+void interface_test_write(PLIC<1, numberInterrupts, maxPriority>& dut)
+{
+	dut.gateway_trigger_interrupt(1);
+
+	unsigned constexpr max_data_length = 100;
+	unsigned data_length = klee_int("data_length");
+	klee_assume(data_length <= max_data_length);
+	uint8_t data[max_data_length];
+	klee_make_symbolic(data, max_data_length, "write data");
+	sc_core::sc_time delay;
+	tlm::tlm_generic_payload pl;
+	pl.set_write();
+	pl.set_address(klee_int("address"));
+	pl.set_data_length(data_length);
+	pl.set_data_ptr(data);
+
+	dut.transport(pl, delay);
+
+	minikernel_step();
+	minikernel_step();
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -206,9 +224,9 @@ int main(int argc, char* argv[])
 	if(test == 0 || ++shit == test)
 		functional_test_priority(dut);
 	if(test == 0 || ++shit == test)
-		interface_test(dut, true);
+		interface_test_read(dut);
 	if(test == 0 || ++shit == test)
-		interface_test(dut, false);
+		interface_test_write(dut);
 
 
 
