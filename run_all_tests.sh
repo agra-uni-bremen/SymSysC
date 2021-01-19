@@ -1,6 +1,14 @@
 #!/bin/bash
 buildfolder="build"
-tests=("sensor" "sensor2" "uart" "plic#1" "plic#2" "plic#3")
+tests=(
+    "sensor#1"
+    "sensor#2"
+    "uart"
+    "plic#1"
+    "plic#2"
+    "plic#3"
+    "plic#4"
+    )
 today=$(date +"%Y-%m-%d-%H.%M")
 testfolder_base=test/$today
 klee_args=(

@@ -153,7 +153,7 @@ void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_wr
 		pl.set_read();
 	} else {
 		pl.set_write();
-		klee_make_symbolic(data, max_data_length, "write data");
+		klee_make_symbolic(data, data_length > 10 ? 10 : data_length, "write data");
 	}
 
 	dut.transport(pl, delay);
@@ -196,9 +196,9 @@ int main(int argc, char* argv[])
 	if(test == 0 || ++shit == test)
 		functional_test_priority(dut);
 	if(test == 0 || ++shit == test)
-		interface_test(dut, false);
-	if(test == 0 || ++shit == test)
 		interface_test(dut, true);
+	if(test == 0 || ++shit == test)
+		interface_test(dut, false);
 
 
 
