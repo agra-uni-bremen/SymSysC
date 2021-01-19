@@ -143,6 +143,7 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 	void register_access_callback(const vp::map::register_access_t &r) {
 		if (r.write && (r.addr >= 0x1000 && r.addr < 0x1000+NumberInterruptEntries*4)) {
+			//NON-Intentional BUG: Checks only for addr, not length
 			assert(false && "pending interrupts registers are read only");
 			return;
 		}
@@ -169,7 +170,7 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 					// NOTE: on completed response, check if there are any other pending
 					// interrupts
 					if (hart_has_pending_enabled_interrupts(i)) {
-						assert(hart_eip[i]);	//FIXME: Addr 2097156???
+						assert(hart_eip[i]);	//FIXME: HERE Overflow
 						// trigger again to make this work even if the SW clears the harts interrupt pending bit
 						target_harts[i]->trigger_external_interrupt();
 					} else {

@@ -16,6 +16,8 @@ struct Simple_interrupt_target : public external_interrupt_target
     void trigger_external_interrupt()
     {
         INFO(std::cout << "Interrupt triggered" << std::endl);
+        //TODO: Assert double triggered interrupt?
+        // assert(!was_triggered && "double triggered interrupt");
         was_triggered = true;
         was_cleared = false;
     };
@@ -24,12 +26,12 @@ struct Simple_interrupt_target : public external_interrupt_target
     {
         INFO(std::cout << "Interrupt cleared" << std::endl);
         was_cleared = true;
-        was_triggered = false;
     };
 
     uint32_t claim_interrupt()
     {
         assert(was_triggered && "tried to claim untriggered interrupt target");
+        was_triggered = false;
 
         sc_core::sc_time delay;
 		tlm::tlm_generic_payload pl;
@@ -44,6 +46,12 @@ struct Simple_interrupt_target : public external_interrupt_target
 
 		//If the interrupt was triggered, there has to be an interrupt in register
 		assert(interrupt > 0);
+
+		pl.set_write();
+		dut.transport(pl, delay);	// notify finished interrupt
+
+		//interrupt was either cleared or triggered for another prio
+		assert(was_cleared || was_triggered);
 
 		INFO(std::cout << "Interrupt " << interrupt << " claimed" << std::endl);
 		return interrupt;
@@ -111,29 +119,30 @@ void functional_test_priority(PLIC<1, numberInterrupts, maxPriority>& dut)
     minikernel_step();
 
     //the step should trigger an external interrupt
-    assert(sit.was_triggered);
+    assert(sit.was_triggered &&
+    		"No triggered interrupt");
 
     // Is correct Interrupt claimable?
     uint32_t first_itr = sit.claim_interrupt();
 
     //Was the itr with the highest prio (lowest val) chosen first?
-    assert(first_itr == lower_itr);
-
-    assert(sit.was_cleared && "Interrupt was not cleared after claim");
+    assert(first_itr == lower_itr &&
+    		"Invalid interrupt sequence");
 
     minikernel_step();
 
-    //the step should trigger an external interrupt
-    assert(sit.was_triggered);
+    assert(sit.was_triggered &&
+			"interrupt was not triggered again for second itr");
 
     // Is correct Interrupt claimable?
     uint32_t second_itr = sit.claim_interrupt();
 
-    //Was the itr with the highest prio (lowest val) chosen first?
-    assert(second_itr == highr_itr);
+    //Was the itr with the highest prio (lowest val) chosen?
+    assert(second_itr == highr_itr &&
+    		"Second itr not from lower prio");
 
-    assert(sit.was_cleared && "Interrupt was not cleared after claim");
-
+    assert(sit.was_cleared &&
+    		"Interrupt was not cleared after claim of last itr");
 }
 
 void interface_test(PLIC<1, numberInterrupts, maxPriority>& dut, bool read_or_write)
