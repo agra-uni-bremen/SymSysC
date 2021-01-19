@@ -104,6 +104,7 @@ void functional_test_priority(PLIC<1, numberInterrupts, maxPriority>& dut)
 
 	uint32_t i = klee_int("i interrupt");
 	uint32_t j = klee_int("j interrupt");
+	INFO(j=2);
 
 	klee_assume(i < numberInterrupts && i > 0);	//ignore reserved zero interrupt
 	klee_assume(j < numberInterrupts && j > 0);
