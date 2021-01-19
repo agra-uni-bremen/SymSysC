@@ -196,9 +196,9 @@ int main(int argc, char* argv[])
 	if(test == 0 || ++shit == test)
 		functional_test_priority(dut);
 	if(test == 0 || ++shit == test)
-		interface_test(dut, false);
-	if(test == 0 || ++shit == test)
 		interface_test(dut, true);
+	if(test == 0 || ++shit == test)
+		interface_test(dut, false);
 
 
 
