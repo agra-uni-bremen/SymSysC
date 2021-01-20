@@ -128,6 +128,8 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 				if (pending_interrupts[idx] & (1 << off)) {
 					auto prio = interrupt_priorities[i];
 					if (prio > 0 && (!consider_threshold || (prio > hart_priority_threshold[hart_id]))) {
+						// Potential bug:
+						//if (prio >= max_priority) {
 						if (prio > max_priority) {
 							max_priority = prio;
 							min_id = i;

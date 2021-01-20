@@ -8,6 +8,7 @@ tests=(
     "plic#2"
     "plic#3"
     "plic#4"
+    "plic#5"
     )
 today=$(date +"%Y-%m-%d-%H.%M")
 testfolder_base=test/$today
@@ -29,9 +30,10 @@ do
 	base_name=$(echo $test | cut -d "#" -f1)
 	subtype=$(echo $test | cut -d "#" -s -f2)
 	testfolder=$testfolder_base/$test
-	echo "Running test $base_name ($subtype)"
+	echo "Building testbench_$base_name"
 	mkdir "$testfolder" 2> /dev/null
 	make -C $buildfolder testbench_$base_name --no-print-directory
+	echo "Running test $base_name ($subtype)"
 	{ time klee ${klee_args[*]} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/run.log" 2>&1
 	mkdir "$testfolder/$today"
 	current_klee_folder=$(readlink -f $buildfolder/klee-last)
