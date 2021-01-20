@@ -129,8 +129,8 @@ void functional_test_priority_direct(PLIC<1, numberInterrupts, maxPriority>& dut
 	dut.gateway_trigger_interrupt(a);
 	dut.gateway_trigger_interrupt(b);
 
-	uint32_t first_itr  = a_prio < b_prio ? a : b;
-	uint32_t second_itr = a_prio < b_prio ? b : a;
+	uint32_t first_itr  = a_prio > b_prio ? a : b;
+	uint32_t second_itr = a_prio > b_prio ? b : a;
 	if(a_prio == b_prio)
 	{	// if same prio, itr num wins
 		first_itr  = a < b ? a : b;

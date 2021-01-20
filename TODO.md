@@ -26,14 +26,6 @@ PLIC Ausführungsgeschwindigkeit wo Probleme?
 
 Erste Erkenntnis: Boost und Fremdlibs verzögern _extrem_ die Ausführung.
 
-        |     PLIC     |  SENSOR_bare  |  SENSOR_TLM_MAP | UART
------------------------------------------------------------------
-Faults  |           4  |            6  |          5
-Instr.  |   3.533.345  |      172.131  |    338.552
-Paths   |          64  |           70  |         80
-Time    |       5.082s |         4,23s |       5,54s
-I/s     |         695  |       40.692  |     61.105
-
 Getrennte Tabellen für jede Testbench.
     -> Fehlergruppen for jede TB
         -> Robustness (interface)
@@ -43,16 +35,10 @@ Getrennte Tabellen für jede Testbench.
             -> Prio richtig?
             -> Interrupt auch claim-bar?
 
-Complete Path exploration time!
-
 
 Error handling (generic values as input, watch behaviour),
 Functional testing
 Fault injection vs Correctness, how?
 
-Testbenches einzeln, und mit/ohne Fehler, Zeitdifferenz
 
-tb | F1 | F2 | F3 | time, paths
-T1 | x  | -  |  - | 400s, 70 paths
-T2 |
-T3 |
+max prio und min id, ist das richtig?
