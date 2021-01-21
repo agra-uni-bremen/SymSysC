@@ -26,6 +26,7 @@ echo "Today is $today, writing to $testfolder_base"
 mkdir -p $testfolder_base 2> /dev/null
 
 make -s -C $buildfolder clean
+i=0 #lol
 for test in ${tests[@]}
 do
 	base_name=$(echo $test | cut -d "#" -f1)
@@ -36,20 +37,21 @@ do
 	make -C $buildfolder testbench_$base_name --no-print-directory
 	echo "Running test $base_name ($subtype)"
 	{ time klee ${klee_args[*]} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/run.log" 2>&1 &
-	klee_pid[$test]=$!
+	klee_pid[$i]=$!
 	echo "$base_name ($subtype) running as $klee_pid[$test]"
 	sleep 1
-	klee_folder[$test]=$(readlink -f $buildfolder/klee-last)
-	klee_target_folder[$test]=$testfolder
+	klee_folder[$i]=$(readlink -f $buildfolder/klee-last)
+	klee_target_folder[$i]=$testfolder
+	$i=$[i + 1]
 done
 
 echo "All processes started. Waiting for processes to finish..."
 
-for test in ${tests[@]}
+for i in {0 ..${#tests[@]}}
 do
-    wait klee_pid[$test]
-    echo "$test finished."
-    mv "$klee_folder[$test]" "$klee_target_folder[$test]"
+    wait klee_pid[$i]
+    echo "$tests[$i] finished."
+    mv "$klee_folder[$i]" "$klee_target_folder[$i]"
 done
 
 
