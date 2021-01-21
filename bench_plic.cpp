@@ -288,20 +288,34 @@ void interface_test_write(PLIC<1, numberInterrupts, maxPriority>& dut)
 int main(int argc, char* argv[])
 {
 	PLIC<1, numberInterrupts, maxPriority> dut("DUT");
+	minikernel_step();	//0ms
 
-	unsigned test = 0;
 	if(argc == 2)
 	{
-		switch(argv[1][0])
-		{
-		case '0' ... '9': test = argv[1][0] - '0';
-			break;
-		default:
-			INFO(std::cout << "Invalid testnumber given. Running all benches (argument 0)." << std::endl);
-		}
+		if(strcmp(argv[1], "functional_test_basic") == 0)
+			functional_test_basic(dut);
+
+		else if(strcmp(argv[1], "functional_test_itr_num_priority") == 0)
+			functional_test_itr_num_priority(dut);
+
+		else if(strcmp(argv[1], "functional_test_consider_threshold") == 0)
+			functional_test_consider_threshold(dut);
+
+		else if(strcmp(argv[1], "functional_test_priority_direct") == 0)
+			functional_test_priority_direct(dut);
+
+		else if(strcmp(argv[1], "interface_test_read") == 0)
+			interface_test_read(dut);
+
+		else if(strcmp(argv[1], "interface_test_write") == 0)
+			interface_test_write(dut);
+
+		else
+			INFO(std::cout << "Invalid test given." << std::endl);
+
 	} else
 	{
-		INFO(std::cout << "No testnumber given. Running all (0) benches" << std::endl);
+		INFO(std::cout << "No test given." << std::endl);
 		//Test info output
 		sc_core::sc_time a(1002, sc_core::SC_MS), b (1, sc_core::SC_SEC), c (1, sc_core::SC_FS);
 		INFO(std::cout << a.to_string() << " + " << b.to_string() << " = " << (a+b).to_string() << std::endl);
@@ -309,24 +323,6 @@ int main(int argc, char* argv[])
 		INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
 		sc_core::Simcontext::get().printInfo();
 	}
-
-
-	minikernel_step();	//0ms
-
-	unsigned shit = 0;
-	if(test == 0 || ++shit == test)
-		functional_test_basic(dut);
-	if(test == 0 || ++shit == test)
-		functional_test_itr_num_priority(dut);
-	if(test == 0 || ++shit == test)
-		functional_test_consider_threshold(dut);
-	if(test == 0 || ++shit == test)
-		functional_test_priority_direct(dut);
-	if(test == 0 || ++shit == test)
-		interface_test_read(dut);
-	if(test == 0 || ++shit == test)
-		interface_test_write(dut);
-
 
 
 	INFO(std::cout << "finished at " << minikernel_current_time() << std::endl);
