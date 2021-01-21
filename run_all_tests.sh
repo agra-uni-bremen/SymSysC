@@ -4,12 +4,12 @@ tests=(
     "sensor#1"
     "sensor#2"
     "uart"
-    "plic#1"
-    "plic#2"
-    "plic#3"
-    "plic#4"
-    "plic#5"
-    "plic#5"
+    "plic#functional_test_basic"
+    "plic#functional_test_itr_num_priority"
+    "plic#functional_test_consider_threshold"
+    "plic#functional_test_priority_direct"
+    "plic#interface_test_read"
+    "plic#interface_test_write"
     )
 today=$(date +"%Y-%m-%d-%H.%M")
 testfolder_base=test/$today
