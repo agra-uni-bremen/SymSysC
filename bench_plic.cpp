@@ -150,6 +150,43 @@ void functional_test_priority_direct(PLIC<1, numberInterrupts, maxPriority>& dut
 			"Invalid interrupt priority calculated");
 }
 
+void functional_test_consider_threshold(PLIC<1, numberInterrupts, maxPriority>& dut)
+{
+	Simple_interrupt_target sit(dut);
+	//interrupt line plic -> sit
+	dut.target_harts[0] = &sit;
+
+	uint32_t a = klee_int("a interrupt");
+	INFO(a=2);
+
+	klee_assume(a < numberInterrupts);
+	//skip reserved interrupt 0
+	klee_assume(a > 0);
+
+	uint32_t a_prio = klee_int("a interrupt priority");
+	INFO(a_prio=1);
+	klee_assume(a_prio < numberInterrupts); //[0...31]
+
+	uint32_t hart_consider_thr = klee_int("hart consider threshold");
+	klee_assume(hart_consider_thr < numberInterrupts);
+
+
+
+	//Direct write into member, skipping transport
+	dut.interrupt_priorities[a] = a_prio;
+	dut.hart_priority_threshold[0] = hart_consider_thr;
+
+	//first trigger may be low or high prio
+	dut.gateway_trigger_interrupt(a);
+
+	uint32_t itr = dut.hart_get_next_pending_interrupt(0, false);
+
+	if(a_prio > hart_consider_thr)
+		assert(itr == a && "Interrupt not considered");
+	else
+		assert(itr == 0 && "Interrupt was considered");
+}
+
 void functional_test_itr_num_priority(PLIC<1, numberInterrupts, maxPriority>& dut)
 {
 	Simple_interrupt_target sit(dut);
@@ -281,6 +318,8 @@ int main(int argc, char* argv[])
 		functional_test_basic(dut);
 	if(test == 0 || ++shit == test)
 		functional_test_itr_num_priority(dut);
+	if(test == 0 || ++shit == test)
+		functional_test_consider_threshold(dut);
 	if(test == 0 || ++shit == test)
 		functional_test_priority_direct(dut);
 	if(test == 0 || ++shit == test)
