@@ -118,7 +118,9 @@ void functional_test_priority_direct(PLIC<1, numberInterrupts, maxPriority>& dut
 	klee_assume(b > 0); //[1...31]
 	klee_assume(a != b);
 
-	klee_assume(a_prio < numberInterrupts); //[0...31]
+	klee_assume(a_prio > 0);
+	klee_assume(b_prio > 0);
+	klee_assume(a_prio < numberInterrupts); //[1...31]	//zero is "disabled", checked in consider thr
 	klee_assume(b_prio < numberInterrupts);
 
 	//Direct write into member, skipping transport
@@ -179,9 +181,9 @@ void functional_test_consider_threshold(PLIC<1, numberInterrupts, maxPriority>& 
 	//first trigger may be low or high prio
 	dut.gateway_trigger_interrupt(a);
 
-	uint32_t itr = dut.hart_get_next_pending_interrupt(0, false);
+	uint32_t itr = dut.hart_get_next_pending_interrupt(0, true);
 
-	if(a_prio > hart_consider_thr)
+	if(a_prio > 0 && a_prio > hart_consider_thr)
 		assert(itr == a && "Interrupt not considered");
 	else
 		assert(itr == 0 && "Interrupt was considered");
