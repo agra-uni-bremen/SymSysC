@@ -298,8 +298,8 @@ int main(int argc, char* argv[])
 		if(strcmp(argv[1], "functional_test_basic") == 0)
 			functional_test_basic(dut);
 
-		else if(strcmp(argv[1], "functional_test_itr_num_priority") == 0)
-			functional_test_itr_num_priority(dut);
+		//else if(strcmp(argv[1], "functional_test_itr_num_priority") == 0)
+		//	functional_test_itr_num_priority(dut);
 
 		else if(strcmp(argv[1], "functional_test_consider_threshold") == 0)
 			functional_test_consider_threshold(dut);
