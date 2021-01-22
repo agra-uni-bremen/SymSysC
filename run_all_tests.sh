@@ -5,7 +5,6 @@ tests=(
     "sensor#2"
     "uart"
     "plic#functional_test_basic"
-    "plic#functional_test_itr_num_priority"
     "plic#functional_test_consider_threshold"
     "plic#functional_test_priority_direct"
     "plic#interface_test_read"
@@ -48,13 +47,21 @@ done
 echo "All processes started. Waiting for processes to finish..."
 
 for ((i=0;i<${#tests[@]};i++)); do
-    echo "waiting for PID ${klee_pid[${i}]}..."
+    echo "waiting for PID ${klee_pid[${i}]} (${tests[${i}]})..."
     wait "${klee_pid[${i}]}"
     echo "${tests[${i}]} finished."
     mv "${klee_folder[${i}]}" "${klee_target_folder[${i}]}"
 done
 
-klee-stats $testfolder_base/* > $testfolder_base/klee-stat.log
-tail $testfolder_base/*/run.log >> $testfolder_base/klee-stat.log
+end_stats=$testfolder_base/klee-stat.log
+
+klee-stats "$testfolder_base"/* > "$end_stats"
+#tail $testfolder_base/*/run.log >> $testfolder_base/klee-stat.log
+
+for ((i=0;i<${#tests[@]};i++)); do
+    echo >> "$end_stats"
+    echo "${klee_target_folder[${i}]}/run.log found errors: " >> "$end_stats"
+    cat "${klee_target_folder[${i}]}/run.log" | grep ERROR >> "$end_stats"
+done
 
 cat $testfolder_base/klee-stat.log

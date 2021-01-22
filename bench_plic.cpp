@@ -187,6 +187,7 @@ void functional_test_consider_threshold(PLIC<1, numberInterrupts, maxPriority>& 
 		assert(itr == 0 && "Interrupt was considered");
 }
 
+/*
 void functional_test_itr_num_priority(PLIC<1, numberInterrupts, maxPriority>& dut)
 {
 	Simple_interrupt_target sit(dut);
@@ -240,6 +241,8 @@ void functional_test_itr_num_priority(PLIC<1, numberInterrupts, maxPriority>& du
     assert(sit.was_cleared &&
     		"Interrupt was not cleared after claim of last itr");
 }
+*/
+
 
 void interface_test_read(PLIC<1, numberInterrupts, maxPriority>& dut)
 {
