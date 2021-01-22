@@ -127,9 +127,8 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 			if (hart_enabled_interrupts[hart_id][idx] & (1 << off)) {
 				if (pending_interrupts[idx] & (1 << off)) {
 					auto prio = interrupt_priorities[i];
-					if (prio > 0 && (!consider_threshold || (prio > hart_priority_threshold[hart_id]))) {
-						// Potential bug:
-						//if (prio >= max_priority) {
+					// intentional BUG: shall be prio > hart_priority_threshold
+					if (prio > 0 && (!consider_threshold || (prio >= hart_priority_threshold[hart_id]))) {
 						if (prio > max_priority) {
 							max_priority = prio;
 							min_id = i;
@@ -172,7 +171,7 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 					// NOTE: on completed response, check if there are any other pending
 					// interrupts
 					if (hart_has_pending_enabled_interrupts(i)) {
-						assert(hart_eip[i]);	//FIXME: HERE Overflow
+						assert(hart_eip[i]);	//BUG: HERE Overflow
 						// trigger again to make this work even if the SW clears the harts interrupt pending bit
 						target_harts[i]->trigger_external_interrupt();
 					} else {
@@ -235,7 +234,6 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 			return;
 HERE1:		
 			
-
 			for (unsigned i=0; i<NumberCores; ++i) {
 				if (!hart_eip[i]) {
 					if (hart_has_pending_enabled_interrupts(i)) {

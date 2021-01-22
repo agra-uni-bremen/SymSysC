@@ -17,8 +17,6 @@ struct Simple_interrupt_target : public external_interrupt_target
     {
         INFO(std::cout << "Interrupt triggered" << std::endl);
         assert(!was_triggered && "interrupt triggered more than once");
-        //TODO: Assert double triggered interrupt?
-        // assert(!was_triggered && "double triggered interrupt");
         was_triggered = true;
         was_cleared = false;
     };
@@ -47,6 +45,12 @@ struct Simple_interrupt_target : public external_interrupt_target
 
 		//If the interrupt was triggered, there has to be an interrupt in register
 		assert(interrupt > 0);
+
+		//Pending ITR shall be reset
+		unsigned idx = interrupt / 32;
+		unsigned off = interrupt % 32;
+		assert(((dut.pending_interrupts[idx] & (1 << off)) == 0) &&
+				"pending interrupt shall be reset after read");
 
 		pl.set_write();
 		dut.transport(pl, delay);	// notify finished interrupt
@@ -145,6 +149,7 @@ void functional_test_priority_direct(PLIC<1, numberInterrupts, maxPriority>& dut
 			"Invalid interrupt priority calculated");
 
 	dut.clear_pending_interrupt(first_itr);
+	minikernel_step();
 
 	uint32_t actual_second_itr = dut.hart_get_next_pending_interrupt(0, false);
 
