@@ -77,8 +77,11 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 		// NOTE: can use different techniques for each gateway, in this case a
 		// simple non queued edge trigger
 
-		//BUG: Shall be < NumInterrupts
+#ifdef EXTRA_BUGS
 		assert(irq_id > 0 && irq_id <= NumberInterrupts);
+#else
+		assert(irq_id > 0 && irq_id < NumberInterrupts);
+#endif
 		// std::cout << "[vp::plic] incoming interrupt " << irq_id << std::endl;
 
 		unsigned idx = irq_id / 32;
@@ -86,28 +89,29 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 
 		pending_interrupts[idx] |= 1 << off;
 
-		//intentional bug
-		if(irq_id == 13)
-			return;
-
+#ifdef EXTRA_BUGS
+		if(irq_id == 13)	//irq 13 not triggered
+					return;
 
 		if(irq_id > 32) {
-			// Intentional bug: irq > 32 is slower than specified
+			//irq > 32 is slower than specified
 			e_run.notify(clock_cycle+sc_core::sc_time(5, sc_core::SC_NS));
 			return;
 		}
+#endif
 
 		e_run.notify(clock_cycle);
 	}
 
 
 	void clear_pending_interrupt(unsigned irq_id) {
-		assert(irq_id >= 0 && irq_id < NumberInterrupts);//NOTE: ignore clear of zero interrupt (zero is not available)
+		assert(irq_id > 0 && irq_id < NumberInterrupts);
 		INFO(std::cout << "[vp::plic] clear pending interrupt " << irq_id << std::endl);
 
-		// Intentional bug
+#ifdef EXTRA_BUGS
 		if(irq_id == 16)
 			return;
+#endif
 
 		unsigned idx = irq_id / 32;
 		unsigned off = irq_id % 32;
@@ -127,8 +131,11 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 			if (hart_enabled_interrupts[hart_id][idx] & (1 << off)) {
 				if (pending_interrupts[idx] & (1 << off)) {
 					auto prio = interrupt_priorities[i];
-					// intentional BUG: shall be prio > hart_priority_threshold
+#ifdef EXTRA_BUGS
 					if (prio > 0 && (!consider_threshold || (prio >= hart_priority_threshold[hart_id]))) {
+#else
+					if (prio > 0 && (!consider_threshold || (prio > hart_priority_threshold[hart_id]))) {
+#endif
 						if (prio > max_priority) {
 							max_priority = prio;
 							min_id = i;

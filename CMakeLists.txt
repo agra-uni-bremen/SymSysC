@@ -34,6 +34,12 @@ add_executable(testbench_plic
 )
 target_link_libraries(testbench_plic sim bench)
 
+add_executable(testbench_plic_fault
+        bench_plic.cpp
+)
+target_compile_definitions(testbench_plic_fault PRIVATE EXTRA_BUGS)
+target_link_libraries(testbench_plic_fault sim bench)
+
 add_executable(testbench_sensor
         bench_sensor.cpp
 )

@@ -1,14 +1,19 @@
 #!/bin/bash
 buildfolder="build"
 tests=(
-    "sensor#1"
-    "sensor#2"
-    "uart"
+    #"sensor#1"
+    #"sensor#2"
+    #"uart"
     "plic#functional_test_basic"
     "plic#functional_test_consider_threshold"
     "plic#functional_test_priority_direct"
     "plic#interface_test_read"
     "plic#interface_test_write"
+    "plic_fault#functional_test_basic"          #Ih, copypasta
+    "plic_fault#functional_test_consider_threshold"
+    "plic_fault#functional_test_priority_direct"
+    "plic_fault#interface_test_read"
+    "plic_fault#interface_test_write"
     )
 today=$(date +"%Y-%m-%d-%H.%M")
 testfolder_base=test/$today
@@ -55,13 +60,14 @@ done
 
 end_stats=$testfolder_base/klee-stat.log
 
-klee-stats "$testfolder_base"/* > "$end_stats"
+klee-stats --print-more "$testfolder_base"/* > "$end_stats"
 #tail $testfolder_base/*/run.log >> $testfolder_base/klee-stat.log
 
 for ((i=0;i<${#tests[@]};i++)); do
     echo >> "$end_stats"
     echo "${klee_target_folder[${i}]}/run.log found errors: " >> "$end_stats"
     cat "${klee_target_folder[${i}]}/run.log" | grep ERROR >> "$end_stats"
+    tail -n 4 "${klee_target_folder[${i}]}/run.log" >> "$end_stats"
 done
 
 cat $testfolder_base/klee-stat.log
