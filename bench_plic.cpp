@@ -111,7 +111,7 @@ void functional_test_priority_direct(PLIC<1, numberInterrupts, maxPriority>& dut
 	INFO(a=2; b=1);
 
 	uint32_t a_prio = klee_int("a interrupt priority");
-	uint32_t b_prio = klee_int("j interrupt priority");
+	uint32_t b_prio = klee_int("b interrupt priority");
 	INFO(a_prio=1; b_prio=2);
 
 
