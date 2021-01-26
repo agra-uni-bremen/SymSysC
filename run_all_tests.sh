@@ -21,6 +21,7 @@ klee_args=(
     "--libcxx"
     "--libc=uclibc"
     "-posix-runtime"
+    "-only-output-states-covering-new"
     #"-max-memory=40000"	#default: 2000 -> 2GB
     #"--emit-all-errors=1"
     )
