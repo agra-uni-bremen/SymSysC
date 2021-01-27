@@ -10,17 +10,21 @@
 #pragma once
 
 
-#if defined(USE_KLEE) && __has_include(<klee/klee.h>)
-# include <klee/klee.h>
-# define INFO( param )
+#if __has_include(<klee/klee.h>)
+#  include <klee/klee.h>
 #else
-# if defined(USE_KLEE)
-#   warning USE_KLEE defined, but no klee include available
-# endif
-# include <iostream>
-# define klee_int( param ) 1
-# define klee_make_symbolic( p1, p2, p3 )
-# define klee_assume( param ) assert(param)
-# define INFO( param ) param
+#  define klee_int( param ) 1
+#  define klee_make_symbolic( p1, p2, p3 )
+#  define klee_assume( param ) assert(param)
+#endif
+
+#if defined(USE_KLEE)
+#  if !__has_include(<klee/klee.h>)
+#    warning USE_KLEE defined, but no klee include available
+#  define INFO( param )
+#  endif
+#else
+#  include <iostream>
+#  define INFO( param ) param
 #endif
 
