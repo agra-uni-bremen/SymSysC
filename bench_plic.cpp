@@ -65,10 +65,7 @@ struct Simple_interrupt_target : public external_interrupt_target
 
 void functional_test_basic(PLIC<1, numberInterrupts, maxPriority>& dut)
 {
-	Simple_interrupt_target sit(dut);
-	//interrupt line plic -> sit
-	dut.target_harts[0] = &sit;
-
+	Simple_interrupt_target &sit = *reinterpret_cast<Simple_interrupt_target*>(dut.target_harts[0]);
 	uint32_t i = klee_int("interrupt number");
 
 	klee_assume(i < numberInterrupts);
@@ -102,10 +99,6 @@ void functional_test_basic(PLIC<1, numberInterrupts, maxPriority>& dut)
 
 void functional_test_priority_direct(PLIC<1, numberInterrupts, maxPriority>& dut)
 {
-	Simple_interrupt_target sit(dut);
-	//interrupt line plic -> sit
-	dut.target_harts[0] = &sit;
-
 	uint32_t a = klee_int("a interrupt");
 	uint32_t b = klee_int("b interrupt");
 	INFO(a=2; b=1);
@@ -159,10 +152,6 @@ void functional_test_priority_direct(PLIC<1, numberInterrupts, maxPriority>& dut
 
 void functional_test_consider_threshold(PLIC<1, numberInterrupts, maxPriority>& dut)
 {
-	Simple_interrupt_target sit(dut);
-	//interrupt line plic -> sit
-	dut.target_harts[0] = &sit;
-
 	uint32_t a = klee_int("a interrupt");
 	INFO(a=2);
 
@@ -298,6 +287,9 @@ void interface_test_write(PLIC<1, numberInterrupts, maxPriority>& dut)
 int main(int argc, char* argv[])
 {
 	PLIC<1, numberInterrupts, maxPriority> dut("DUT");
+	Simple_interrupt_target sit(dut);
+	//interrupt line plic -> sit
+	dut.target_harts[0] = &sit;
 	minikernel_step();	//0ms
 
 	if(argc == 2)
