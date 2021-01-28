@@ -21,8 +21,8 @@
 #if defined(USE_KLEE)
 #  if !__has_include(<klee/klee.h>)
 #    warning USE_KLEE defined, but no klee include available
-#  define INFO( param )
 #  endif
+#  define INFO( param )
 #else
 #  include <iostream>
 #  define INFO( param ) param
