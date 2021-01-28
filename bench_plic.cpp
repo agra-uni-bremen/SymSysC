@@ -68,8 +68,6 @@ void functional_test_basic(PLIC<1, numberInterrupts, maxPriority>& dut)
 	Simple_interrupt_target &sit = *reinterpret_cast<Simple_interrupt_target*>(dut.target_harts[0]);
 	uint32_t i = klee_int("interrupt number");
 
-	klee_assume(i < numberInterrupts);
-
     dut.gateway_trigger_interrupt(i);
 
     //Is the pending interrupts register changed?
