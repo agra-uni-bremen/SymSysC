@@ -267,13 +267,16 @@ void interface_test_write(PLIC<1, numberInterrupts, maxPriority>& dut)
 
 	unsigned constexpr max_data_length = 100;
 	unsigned data_length = klee_int("data_length");
+	INFO(data_length = 0);
 	klee_assume(data_length <= max_data_length);
 	uint8_t data[max_data_length];
 	klee_make_symbolic(data, max_data_length, "write data");
+	INFO(memset(data, 0, max_data_length));
 	sc_core::sc_time delay;
 	tlm::tlm_generic_payload pl;
 	pl.set_write();
 	pl.set_address(klee_int("address"));
+	INFO(pl.set_address(0x00200004));
 	pl.set_data_length(data_length);
 	pl.set_data_ptr(data);
 
