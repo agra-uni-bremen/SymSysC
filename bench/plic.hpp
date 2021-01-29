@@ -180,7 +180,9 @@ struct PLIC : public sc_core::sc_module, public interrupt_gateway {
 					if (hart_has_pending_enabled_interrupts(i)) {
 						assert(hart_eip[i]);	//BUG: HERE Overflow
 						// trigger again to make this work even if the SW clears the harts interrupt pending bit
+#ifndef EXTRA_BUGS
 						target_harts[i]->trigger_external_interrupt();
+#endif
 					} else {
 						hart_eip[i] = false;
 						target_harts[i]->clear_external_interrupt();
