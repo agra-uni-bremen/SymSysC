@@ -24,6 +24,8 @@ struct Simple_interrupt_target : public external_interrupt_target
     void clear_external_interrupt()
     {
         INFO(std::cout << "Interrupt cleared" << std::endl);
+	assert(!was_cleared &&
+ 		"interrupt cleared more than once");
         was_cleared = true;
     };
 
