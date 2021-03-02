@@ -222,6 +222,8 @@ void functional_test_itr_num_priority(PLIC<1, numberInterrupts, maxPriority>& du
     assert(first_itr == lower_itr &&
     		"Invalid interrupt sequence");
 
+    assert(!sit.was_triggered);
+
     minikernel_step();
 
     assert(sit.was_triggered &&
