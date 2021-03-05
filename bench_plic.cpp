@@ -1,6 +1,6 @@
+#include "klee_conf.h"
 #include "bench/plic_translated.hpp"
 #include "minikernel/registry.hpp"
-#include "minikernel/klee_conf.h"
 
 //todo more flexible?
 static constexpr uint32_t numberInterrupts = 64, maxPriority = 32;

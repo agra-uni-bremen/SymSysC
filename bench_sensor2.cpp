@@ -1,6 +1,6 @@
+#include "klee_conf.h"
 #include "bench/sensor2.h"
 #include "minikernel/registry.hpp"
-#include "minikernel/klee_conf.h"
 
 
 struct test_interrupt_gateway : interrupt_gateway{

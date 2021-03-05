@@ -27,6 +27,7 @@ endif()
 
 find_package( SystemC REQUIRED)
 
+include_directories(.)  #klee_conf.h
 subdirs(minikernel)
 subdirs(bench)
 
@@ -35,6 +36,12 @@ add_executable(testbench_plic
         bench_plic.cpp
 )
 target_link_libraries(testbench_plic minikernel bench_translated)
+
+add_executable(testbench_vanilla_plic
+        bench_plic_vanilla.cpp
+)
+target_include_directories(testbench_vanilla_plic PRIVATE ${SystemC_INCLUDE_DIR})
+target_link_libraries(testbench_vanilla_plic ${SystemC_LIBRARIES} bench_vanilla)
 
 add_executable(testbench_plic_fault
         bench_plic.cpp
@@ -62,26 +69,6 @@ set(KLEE_ARGS
 	"--libc=uclibc"
 	"-posix-runtime"
 	#"--emit-all-errors=1"
-)
-
-add_custom_target(test_plic
-    COMMAND time klee ${KLEE_ARGS} testbench_plic
-    DEPENDS testbench_plic
-)
-
-add_custom_target(test_sensor
-    COMMAND time klee ${KLEE_ARGS} testbench_sensor
-    DEPENDS testbench_sensor
-)
-
-add_custom_target(test_sensor2
-    COMMAND time klee ${KLEE_ARGS} testbench_sensor2
-    DEPENDS testbench_sensor2
-)
-
-add_custom_target(test_uart
-    COMMAND time klee ${KLEE_ARGS} testbench_sensor2
-    DEPENDS testbench_uart
 )
 
 add_custom_target(run_klee_tests_with_instructions
