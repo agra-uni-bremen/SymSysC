@@ -1,6 +1,6 @@
 #include "bench/uart16550.h"
-#include "sim/registry.hpp"
-#include "sim/klee_conf.h"
+#include "minikernel/registry.hpp"
+#include "minikernel/klee_conf.h"
 
 
 int main()

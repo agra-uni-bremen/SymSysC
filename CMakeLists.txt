@@ -25,35 +25,37 @@ else() #native
     MESSAGE("Building native C/C++")
 endif()
 
+find_package( SystemC REQUIRED)
 
-subdirs(sim)
+subdirs(minikernel)
 subdirs(bench)
+
 
 add_executable(testbench_plic
         bench_plic.cpp
 )
-target_link_libraries(testbench_plic sim bench)
+target_link_libraries(testbench_plic minikernel bench_translated)
 
 add_executable(testbench_plic_fault
         bench_plic.cpp
 )
 target_compile_definitions(testbench_plic_fault PRIVATE EXTRA_BUGS)
-target_link_libraries(testbench_plic_fault sim bench)
+target_link_libraries(testbench_plic_fault minikernel bench_translated)
 
 add_executable(testbench_sensor
         bench_sensor.cpp
 )
-target_link_libraries(testbench_sensor sim bench)
+target_link_libraries(testbench_sensor minikernel bench_translated)
 
 add_executable(testbench_sensor2
         bench_sensor2.cpp
 )
-target_link_libraries(testbench_sensor2 sim bench)
+target_link_libraries(testbench_sensor2 minikernel bench_translated)
 
 add_executable(testbench_uart
         bench_uart.cpp
 )
-target_link_libraries(testbench_uart sim bench)
+target_link_libraries(testbench_uart minikernel bench_translated)
 
 set(KLEE_ARGS 
 	"--libcxx"
