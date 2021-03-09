@@ -16,19 +16,17 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif()
 
+find_package( SystemC REQUIRED)
 
 if(BUILD STREQUAL "bytecode")
     enable_language(BYTECODE)
     MESSAGE("Building LLVM BYTECODE for Klee")
     set(SystemC_LIBRARIES ${SystemC_BYTECODE_LIBRARIES})
-    MESSAGE("Die huren-libs sind in: ${SystemC_LIBRARIES}")
 else() #native
     enable_language(CXX)
     MESSAGE("Building native C/C++")
     set(SystemC_LIBRARIES ${SystemC_CXX__LIBRARIES})
 endif()
-
-find_package( SystemC REQUIRED)
 
 include_directories(.)  #klee_conf.h
 subdirs(minikernel)
