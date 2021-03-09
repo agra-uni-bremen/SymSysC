@@ -66,14 +66,21 @@ struct Simple_interrupt_target : public external_interrupt_target
     }
 };
 
-struct functional_test_basic : public sc_core::sc_module {
-
+struct Test {
+protected:
 	PLIC<1, numberInterrupts, maxPriority>& dut;
+public:
+	Test(PLIC<1, numberInterrupts, maxPriority>& dut) : dut(dut){};
+	virtual ~Test(){};
+};
+
+struct functional_test_basic : public Test, public sc_core::sc_module {
+
 	SC_HAS_PROCESS(functional_test_basic);
 	tlm_utils::simple_initiator_socket<functional_test_basic> isock;
 
 	functional_test_basic(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
-		: sc_module(nem) , dut(dut){
+		: sc_module(nem) , Test(dut){
 		SC_THREAD(run);
 	};
 

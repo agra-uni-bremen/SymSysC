@@ -25,7 +25,7 @@ if(BUILD STREQUAL "bytecode")
 else() #native
     enable_language(CXX)
     MESSAGE("Building native C/C++")
-    set(SystemC_LIBRARIES ${SystemC_CXX__LIBRARIES})
+    set(SystemC_LIBRARIES ${SystemC_CXX_LIBRARIES})
 endif()
 
 include_directories(.)  #klee_conf.h
