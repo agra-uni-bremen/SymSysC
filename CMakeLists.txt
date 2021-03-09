@@ -42,7 +42,7 @@ add_executable(testbench_vanilla_plic
         bench_plic_vanilla.cpp
 )
 target_include_directories(testbench_vanilla_plic PRIVATE ${SystemC_INCLUDE_DIR})
-target_compile_definitions(testbench_plic_fault PRIVATE EXTRA_BUGS)
+target_compile_definitions(testbench_vanilla_plic PRIVATE EXTRA_BUGS)
 target_link_libraries(testbench_vanilla_plic ${SystemC_LIBRARIES} bench_vanilla)
 
 add_executable(testbench_plic_fault
