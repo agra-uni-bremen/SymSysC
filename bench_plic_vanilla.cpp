@@ -66,21 +66,14 @@ struct Simple_interrupt_target : public external_interrupt_target
     }
 };
 
-struct Test {
-protected:
+
+struct functional_test_basic : public sc_core::sc_module {
 	PLIC<1, numberInterrupts, maxPriority>& dut;
-public:
-	Test(PLIC<1, numberInterrupts, maxPriority>& dut) : dut(dut){};
-	virtual ~Test(){};
-};
-
-struct functional_test_basic : public Test, public sc_core::sc_module {
-
 	SC_HAS_PROCESS(functional_test_basic);
 	tlm_utils::simple_initiator_socket<functional_test_basic> isock;
 
 	functional_test_basic(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
-		: sc_module(nem) , Test(dut){
+		: sc_module(nem) , dut(dut){
 		SC_THREAD(run);
 	};
 
@@ -121,57 +114,68 @@ struct functional_test_basic : public Test, public sc_core::sc_module {
 };
 
 /*
-void functional_test_priority_direct(PLIC<1, numberInterrupts, maxPriority>& dut)
-{
-	uint32_t a = klee_int("a interrupt");
-	uint32_t b = klee_int("b interrupt");
-	INFO(a=2; b=1);
+struct functional_test_priority_direct : public sc_core::sc_module {
+	PLIC<1, numberInterrupts, maxPriority>& dut;
+	SC_HAS_PROCESS(functional_test_priority_direct);
+	tlm_utils::simple_initiator_socket<functional_test_priority_direct> isock;
 
-	uint32_t a_prio = klee_int("a interrupt priority");
-	uint32_t b_prio = klee_int("b interrupt priority");
-	INFO(a_prio=1; b_prio=2);
+	functional_test_priority_direct(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
+		: sc_module(nem) , dut(dut){
+		SC_THREAD(run);
+	};
+
+	void run()
+	{
+		uint32_t a = klee_int("a interrupt");
+		uint32_t b = klee_int("b interrupt");
+		INFO(a=2; b=1);
+
+		uint32_t a_prio = klee_int("a interrupt priority");
+		uint32_t b_prio = klee_int("b interrupt priority");
+		INFO(a_prio=1; b_prio=2);
 
 
-	klee_assume(a < numberInterrupts);
-	klee_assume(b < numberInterrupts);
-	//skip reserved interrupt 0
-	klee_assume(a > 0);
-	klee_assume(b > 0); //[1...31]
-	klee_assume(a != b);
+		klee_assume(a < numberInterrupts);
+		klee_assume(b < numberInterrupts);
+		//skip reserved interrupt 0
+		klee_assume(a > 0);
+		klee_assume(b > 0); //[1...31]
+		klee_assume(a != b);
 
-	klee_assume(a_prio > 0);
-	klee_assume(b_prio > 0);
-	klee_assume(a_prio < numberInterrupts); //[1...31]	//zero is "disabled", checked in consider thr
-	klee_assume(b_prio < numberInterrupts);
+		klee_assume(a_prio > 0);
+		klee_assume(b_prio > 0);
+		klee_assume(a_prio < numberInterrupts); //[1...31]	//zero is "disabled", checked in consider thr
+		klee_assume(b_prio < numberInterrupts);
 
-	//Direct write into member, skipping transport
-	dut.interrupt_priorities[a] = a_prio;
-	dut.interrupt_priorities[b] = b_prio;
+		//Direct write into member, skipping transport
+		dut.interrupt_priorities[a] = a_prio;
+		dut.interrupt_priorities[b] = b_prio;
 
-	//first trigger may be low or high prio
-	dut.gateway_trigger_interrupt(a);
-	dut.gateway_trigger_interrupt(b);
+		//first trigger may be low or high prio
+		dut.gateway_trigger_interrupt(a);
+		dut.gateway_trigger_interrupt(b);
 
-	uint32_t first_itr  = a_prio > b_prio ? a : b;
-	uint32_t second_itr = a_prio > b_prio ? b : a;
-	if(a_prio == b_prio)
-	{	// if same prio, itr num wins
-		first_itr  = a < b ? a : b;
-		second_itr = a < b ? b : a;
+		uint32_t first_itr  = a_prio > b_prio ? a : b;
+		uint32_t second_itr = a_prio > b_prio ? b : a;
+		if(a_prio == b_prio)
+		{	// if same prio, itr num wins
+			first_itr  = a < b ? a : b;
+			second_itr = a < b ? b : a;
+		}
+
+		uint32_t actual_first_itr = dut.hart_get_next_pending_interrupt(0, false);
+
+		assert(actual_first_itr == first_itr &&
+				"Invalid interrupt priority calculated");
+
+		dut.clear_pending_interrupt(first_itr);
+		minikernel_step();
+
+		uint32_t actual_second_itr = dut.hart_get_next_pending_interrupt(0, false);
+
+		assert(actual_second_itr == second_itr &&
+				"Invalid interrupt priority calculated");
 	}
-
-	uint32_t actual_first_itr = dut.hart_get_next_pending_interrupt(0, false);
-
-	assert(actual_first_itr == first_itr &&
-			"Invalid interrupt priority calculated");
-
-	dut.clear_pending_interrupt(first_itr);
-	minikernel_step();
-
-	uint32_t actual_second_itr = dut.hart_get_next_pending_interrupt(0, false);
-
-	assert(actual_second_itr == second_itr &&
-			"Invalid interrupt priority calculated");
 }
 
 void functional_test_consider_threshold(PLIC<1, numberInterrupts, maxPriority>& dut)
