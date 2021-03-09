@@ -21,7 +21,7 @@ find_package( SystemC REQUIRED)
 if(BUILD STREQUAL "bytecode")
     enable_language(BYTECODE)
     MESSAGE("Building LLVM BYTECODE for Klee")
-    set(SystemC_LIBRARIES ${SystemC_BYTECODE_LIBRARIES})
+    #set(SystemC_LIBRARIES "${SystemC_BYTECODE_LIBRARIES})
 else() #native
     enable_language(CXX)
     MESSAGE("Building native C/C++")
