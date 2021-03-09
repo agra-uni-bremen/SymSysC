@@ -76,3 +76,9 @@ add_custom_target(run_klee_tests_with_instructions
     COMMAND time klee ${KLEE_ARGS} --debug-print-instructions=src:file testbench_plic
     DEPENDS testbench_plic
 )
+
+add_custom_target(run_vanilla_bench
+    COMMAND time klee -link-llvm-lib=../source/systemc-dist/lib_llvm/libsystemc.so --libcxx testbench_vanilla_plic
+    DEPENDS testbench_vanilla_plic
+)
+ 
