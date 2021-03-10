@@ -1,5 +1,6 @@
 #!/bin/bash
 buildfolder="build"
+sourcefolder="source"
 tests=(
     #"sensor#1"
     #"sensor#2"
@@ -31,7 +32,7 @@ klee_args=(
     #"--emit-all-errors=1"
     )
 klee_vanilla_args=(
-    "-link-llvm-lib=../source/systemc-dist/lib_llvm/libsystemc.so"
+    "-link-llvm-lib=${sourcefolder}/systemc-dist/lib_llvm/libsystemc.so"
     "--libcxx"
     )
 
@@ -52,10 +53,10 @@ do
 	echo "Running test $base_name ($subtype)"
 	if [[ $base_name == *"vanilla"* ]]; then
         echo "Using vanilla SysC args"
-        args=klee_vanilla_args
+        args=$klee_vanilla_args
     else
         echo "Using normal klee args"
-        args=klee_args
+        args=$klee_args
     fi
 	{ time klee ${args[*]} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/run.log" 2>&1 &
 	klee_pid[${i}]=$!
