@@ -75,6 +75,7 @@ struct functional_test_basic : public sc_core::sc_module {
 	functional_test_basic(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
 		: sc_module(nem) , dut(dut){
 		SC_THREAD(run);
+		isock.bind(dut.tsock);
 	};
 
 	void run()
@@ -108,12 +109,10 @@ struct functional_test_basic : public sc_core::sc_module {
 
 		//The pending interrupt register should be cleared after claim
 		assert(dut.pending_interrupts[0] == 0 && dut.pending_interrupts[1] == 0);
-
-		sc_core::sc_stop();
 	}
 };
 
-/*
+
 struct functional_test_priority_direct : public sc_core::sc_module {
 	PLIC<1, numberInterrupts, maxPriority>& dut;
 	SC_HAS_PROCESS(functional_test_priority_direct);
@@ -122,6 +121,7 @@ struct functional_test_priority_direct : public sc_core::sc_module {
 	functional_test_priority_direct(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
 		: sc_module(nem) , dut(dut){
 		SC_THREAD(run);
+		isock.bind(dut.tsock);
 	};
 
 	void run()
@@ -169,17 +169,27 @@ struct functional_test_priority_direct : public sc_core::sc_module {
 				"Invalid interrupt priority calculated");
 
 		dut.clear_pending_interrupt(first_itr);
-		minikernel_step();
+		wait();
 
 		uint32_t actual_second_itr = dut.hart_get_next_pending_interrupt(0, false);
 
 		assert(actual_second_itr == second_itr &&
 				"Invalid interrupt priority calculated");
 	}
-}
+};
 
-void functional_test_consider_threshold(PLIC<1, numberInterrupts, maxPriority>& dut)
-{
+
+struct functional_test_consider_threshold : public sc_core::sc_module {
+	PLIC<1, numberInterrupts, maxPriority>& dut;
+	SC_HAS_PROCESS(functional_test_priority_direct);
+	tlm_utils::simple_initiator_socket<functional_test_consider_threshold> isock;
+
+	functional_test_consider_threshold(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
+		: sc_module(nem) , dut(dut){
+		SC_THREAD(run);
+		isock.bind(dut.tsock);
+	};
+	void run() {
 	uint32_t a = klee_int("a interrupt");
 	INFO(a=2);
 
@@ -195,7 +205,6 @@ void functional_test_consider_threshold(PLIC<1, numberInterrupts, maxPriority>& 
 	klee_assume(hart_consider_thr < numberInterrupts);
 
 
-
 	//Direct write into member, skipping transport
 	dut.interrupt_priorities[a] = a_prio;
 	dut.hart_priority_threshold[0] = hart_consider_thr;
@@ -209,54 +218,76 @@ void functional_test_consider_threshold(PLIC<1, numberInterrupts, maxPriority>& 
 		assert(itr == a && "Interrupt not considered");
 	else
 		assert(itr == 0 && "Interrupt was considered");
-}
+	}
+};
 
-void interface_test_read(PLIC<1, numberInterrupts, maxPriority>& dut)
-{
-	dut.gateway_trigger_interrupt(1);
 
-	unsigned constexpr max_data_length = 1000;
-	unsigned data_length = klee_int("data_length");
-	klee_assume(data_length <= max_data_length);
-	uint8_t data[max_data_length];
-	sc_core::sc_time delay;
-	tlm::tlm_generic_payload pl;
-	pl.set_read();
-	pl.set_address(klee_int("address"));
-	pl.set_data_length(data_length);
-	pl.set_data_ptr(data);
+struct interface_test_read : public sc_core::sc_module {
+	PLIC<1, numberInterrupts, maxPriority>& dut;
+	SC_HAS_PROCESS(interface_test_read);
+	tlm_utils::simple_initiator_socket<interface_test_read> isock;
 
-	dut.transport(pl, delay);
+	interface_test_read(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
+		: sc_module(nem) , dut(dut){
+		SC_THREAD(run);
+		isock.bind(dut.tsock);
+	};
+	void run() {
+		dut.gateway_trigger_interrupt(1);
 
-	minikernel_step();
-	minikernel_step();
-}
+		unsigned constexpr max_data_length = 1000;
+		unsigned data_length = klee_int("data_length");
+		klee_assume(data_length <= max_data_length);
+		uint8_t data[max_data_length];
+		sc_core::sc_time delay;
+		tlm::tlm_generic_payload pl;
+		pl.set_read();
+		pl.set_address(klee_int("address"));
+		pl.set_data_length(data_length);
+		pl.set_data_ptr(data);
 
-void interface_test_write(PLIC<1, numberInterrupts, maxPriority>& dut)
-{
-	dut.gateway_trigger_interrupt(1);
+		dut.transport(pl, delay);
 
-	unsigned constexpr max_data_length = 100;
-	unsigned data_length = klee_int("data_length");
-	INFO(data_length = 0);
-	klee_assume(data_length <= max_data_length);
-	uint8_t data[max_data_length];
-	klee_make_symbolic(data, max_data_length, "write data");
-	INFO(memset(data, 0, max_data_length));
-	sc_core::sc_time delay;
-	tlm::tlm_generic_payload pl;
-	pl.set_write();
-	pl.set_address(klee_int("address"));
-	INFO(pl.set_address(0x00200004));
-	pl.set_data_length(data_length);
-	pl.set_data_ptr(data);
+		wait();
+		wait();
+	}
+};
 
-	dut.transport(pl, delay);
+struct interface_test_write : public sc_core::sc_module {
+	PLIC<1, numberInterrupts, maxPriority>& dut;
+	SC_HAS_PROCESS(interface_test_write);
+	tlm_utils::simple_initiator_socket<interface_test_write> isock;
 
-	minikernel_step();
-	minikernel_step();
-}
-*/
+	interface_test_write(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
+		: sc_module(nem) , dut(dut){
+		SC_THREAD(run);
+		isock.bind(dut.tsock);
+	};
+	void run()
+	{
+		dut.gateway_trigger_interrupt(1);
+
+		unsigned constexpr max_data_length = 100;
+		unsigned data_length = klee_int("data_length");
+		INFO(data_length = 0);
+		klee_assume(data_length <= max_data_length);
+		uint8_t data[max_data_length];
+		klee_make_symbolic(data, max_data_length, "write data");
+		INFO(memset(data, 0, max_data_length));
+		sc_core::sc_time delay;
+		tlm::tlm_generic_payload pl;
+		pl.set_write();
+		pl.set_address(klee_int("address"));
+		INFO(pl.set_address(0x00200004));
+		pl.set_data_length(data_length);
+		pl.set_data_ptr(data);
+
+		dut.transport(pl, delay);
+
+		wait();
+		wait();
+	}
+};
 
 
 int sc_main(int argc, char* argv[])
@@ -267,29 +298,40 @@ int sc_main(int argc, char* argv[])
 	dut.target_harts[0] = &sit;
 	//minikernel_step();	//0ms
 
-	/*
+
 	if(argc == 2)
 	{
 		if(strcmp(argv[1], "functional_test_basic") == 0)
-			functional_test_basic(dut);
+		{
+			functional_test_basic testbench("nam", dut);
+			sc_start();
+		}
 
 		//else if(strcmp(argv[1], "functional_test_itr_num_priority") == 0)
 		//	functional_test_itr_num_priority(dut);
 
 		else if(strcmp(argv[1], "functional_test_consider_threshold") == 0)
-			functional_test_consider_threshold(dut);
-
+		{
+			functional_test_consider_threshold testbench("nam", dut);
+			sc_start();
+		}
 		else if(strcmp(argv[1], "functional_test_priority_direct") == 0)
-			functional_test_priority_direct(dut);
-
+		{
+			functional_test_priority_direct testbench("nam", dut);
+			sc_start();
+		}
 		else if(strcmp(argv[1], "interface_test_read") == 0)
-			interface_test_read(dut);
-
+		{
+			interface_test_read testbench("nam", dut);
+			sc_start();
+		}
 		else if(strcmp(argv[1], "interface_test_write") == 0)
-			interface_test_write(dut);
-
+		{
+			interface_test_write testbench("nam", dut);
+			sc_start();
+		}
 		else
-			INFO(std::cout << "Invalid test given." << std::endl);
+			INFO(std::cout << "Invalid test " << argv[1] << " given." << std::endl);
 
 	} else
 	{
@@ -297,17 +339,12 @@ int sc_main(int argc, char* argv[])
 		//Test info output
 		sc_core::sc_time a(1002, sc_core::SC_MS), b (1, sc_core::SC_SEC), c (1, sc_core::SC_FS);
 		INFO(std::cout << a.to_string() << " + " << b.to_string() << " = " << (a+b).to_string() << std::endl);
-		INFO(std::cout << c.to_string() << " in default units is " << c.to_default_time_units() << " " << sc_core::unit_to_string(sc_core::default_time_unit) << std::endl);
-		INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
-		sc_core::Simcontext::get().printInfo();
-	}*/
-
-	functional_test_basic testbench("nam", dut);
-
-	testbench.isock.bind(dut.tsock);
+		//INFO(std::cout << c.to_string() << " in default units is " << c.to_default_time_units() << " " << sc_core::unit_to_string(sc_core::default_time_unit) << std::endl);
+		//INFO(std::cout << "Number of registered transports: " << transports.size() << std::endl);
+		//sc_core::Simcontext::get().printInfo();
+	}
 
 
-	sc_start();
 
 	INFO(std::cout << "finished at " << sc_core::sc_time_stamp() << std::endl);
 
