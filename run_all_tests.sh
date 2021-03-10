@@ -14,6 +14,11 @@ tests=(
     "plic_fault#functional_test_priority_direct"
     "plic_fault#interface_test_read"
     "plic_fault#interface_test_write"
+    "vanilla_plic#functional_test_basic"          #Ih, copypasta
+    "vanilla_plic#functional_test_consider_threshold"
+    "vanilla_plic#functional_test_priority_direct"
+    "vanilla_plic#interface_test_read"
+    "vanilla_plic#interface_test_write"
     )
 today=$(date +"%Y-%m-%d-%H.%M")
 testfolder_base=test/$today
@@ -24,6 +29,10 @@ klee_args=(
     "-only-output-states-covering-new"
     #"-max-memory=40000"	#default: 2000 -> 2GB
     #"--emit-all-errors=1"
+    )
+klee_vanilla_args=(
+    "-link-llvm-lib=../source/systemc-dist/lib_llvm/libsystemc.so"
+    "--libcxx"
     )
 
 echo "Today is $today, writing to $testfolder_base"
@@ -41,7 +50,14 @@ do
 	mkdir "$testfolder" 2> /dev/null
 	make -C $buildfolder testbench_$base_name --no-print-directory
 	echo "Running test $base_name ($subtype)"
-	{ time klee ${klee_args[*]} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/run.log" 2>&1 &
+	if [[ $base_name == *"vanilla"* ]]; then
+        echo "Using vanilla SysC args"
+        args=klee_vanilla_args
+    else
+        echo "Using normal klee args"
+        args=klee_args
+    fi
+	{ time klee ${args[*]} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/run.log" 2>&1 &
 	klee_pid[${i}]=$!
 	sleep 1
 	klee_folder[${i}]=$(readlink -f $buildfolder/klee-last)
