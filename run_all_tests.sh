@@ -1,6 +1,6 @@
 #!/bin/bash
 buildfolder="build"
-sourcefolder="source"
+sourcefolder=$(realpath source)
 tests=(
     #"sensor#1"
     #"sensor#2"
