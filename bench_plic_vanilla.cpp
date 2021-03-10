@@ -6,13 +6,17 @@
 //todo more flexible?
 static constexpr uint32_t numberInterrupts = 64, maxPriority = 32;
 
+template <class test>
 struct Simple_interrupt_target : public external_interrupt_target
 {
     bool was_triggered = false;
     bool was_cleared = false;
     PLIC<1, numberInterrupts, maxPriority>& dut;
+    tlm_utils::simple_initiator_socket<test>& isock;
 
-    Simple_interrupt_target(PLIC<1, numberInterrupts, maxPriority>& dut) : dut(dut){};
+    Simple_interrupt_target(PLIC<1, numberInterrupts, maxPriority>& dut,
+    		tlm_utils::simple_initiator_socket<test>& isock)
+    		: dut(dut), isock(isock){};
 
     void trigger_external_interrupt()
     {
@@ -56,7 +60,7 @@ struct Simple_interrupt_target : public external_interrupt_target
 				"pending interrupt shall be reset after read");
 
 		pl.set_write();
-		dut.transport(pl, delay);	// notify finished interrupt
+		isock->b_transport(pl, delay);	// notify finished interrupt
 
 		//interrupt was either cleared or triggered for another prio
 		assert(was_cleared || was_triggered);
@@ -70,17 +74,19 @@ struct Simple_interrupt_target : public external_interrupt_target
 struct functional_test_basic : public sc_core::sc_module {
 	PLIC<1, numberInterrupts, maxPriority>& dut;
 	SC_HAS_PROCESS(functional_test_basic);
+	Simple_interrupt_target<functional_test_basic> sit;
 	tlm_utils::simple_initiator_socket<functional_test_basic> isock;
 
 	functional_test_basic(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
-		: sc_module(nem) , dut(dut){
+		: sc_module(nem) , dut(dut), sit(dut, isock){
 		SC_THREAD(run);
+		//interrupt line plic -> sit
+		dut.target_harts[0] = &sit;
 		isock.bind(dut.tsock);
 	};
 
 	void run()
 	{
-		Simple_interrupt_target &sit = *reinterpret_cast<Simple_interrupt_target*>(dut.target_harts[0]);
 		uint32_t i = klee_int("interrupt number");
 
 		dut.gateway_trigger_interrupt(i);
@@ -116,11 +122,14 @@ struct functional_test_basic : public sc_core::sc_module {
 struct functional_test_priority_direct : public sc_core::sc_module {
 	PLIC<1, numberInterrupts, maxPriority>& dut;
 	SC_HAS_PROCESS(functional_test_priority_direct);
+	Simple_interrupt_target<functional_test_priority_direct> sit;
 	tlm_utils::simple_initiator_socket<functional_test_priority_direct> isock;
 
 	functional_test_priority_direct(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
-		: sc_module(nem) , dut(dut){
+		: sc_module(nem) , dut(dut), sit(dut, isock){
 		SC_THREAD(run);
+		//interrupt line plic -> sit
+		dut.target_harts[0] = &sit;
 		isock.bind(dut.tsock);
 	};
 
@@ -181,12 +190,15 @@ struct functional_test_priority_direct : public sc_core::sc_module {
 
 struct functional_test_consider_threshold : public sc_core::sc_module {
 	PLIC<1, numberInterrupts, maxPriority>& dut;
-	SC_HAS_PROCESS(functional_test_priority_direct);
+	SC_HAS_PROCESS(functional_test_consider_threshold);
+	Simple_interrupt_target<functional_test_consider_threshold> sit;
 	tlm_utils::simple_initiator_socket<functional_test_consider_threshold> isock;
 
 	functional_test_consider_threshold(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
-		: sc_module(nem) , dut(dut){
+		: sc_module(nem), dut(dut), sit(dut, isock){
 		SC_THREAD(run);
+		//interrupt line plic -> sit
+		dut.target_harts[0] = &sit;
 		isock.bind(dut.tsock);
 	};
 	void run() {
@@ -225,11 +237,14 @@ struct functional_test_consider_threshold : public sc_core::sc_module {
 struct interface_test_read : public sc_core::sc_module {
 	PLIC<1, numberInterrupts, maxPriority>& dut;
 	SC_HAS_PROCESS(interface_test_read);
+	Simple_interrupt_target<interface_test_read> sit;
 	tlm_utils::simple_initiator_socket<interface_test_read> isock;
 
 	interface_test_read(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
-		: sc_module(nem) , dut(dut){
+		: sc_module(nem), dut(dut), sit(dut, isock){
 		SC_THREAD(run);
+		//interrupt line plic -> sit
+		dut.target_harts[0] = &sit;
 		isock.bind(dut.tsock);
 	};
 	void run() {
@@ -256,11 +271,14 @@ struct interface_test_read : public sc_core::sc_module {
 struct interface_test_write : public sc_core::sc_module {
 	PLIC<1, numberInterrupts, maxPriority>& dut;
 	SC_HAS_PROCESS(interface_test_write);
+	Simple_interrupt_target<interface_test_write> sit;
 	tlm_utils::simple_initiator_socket<interface_test_write> isock;
 
 	interface_test_write(sc_core::sc_module_name nem, PLIC<1, numberInterrupts, maxPriority>& dut)
-		: sc_module(nem) , dut(dut){
+		: sc_module(nem), dut(dut), sit(dut, isock){
 		SC_THREAD(run);
+		//interrupt line plic -> sit
+		dut.target_harts[0] = &sit;
 		isock.bind(dut.tsock);
 	};
 	void run()
@@ -293,11 +311,6 @@ struct interface_test_write : public sc_core::sc_module {
 int sc_main(int argc, char* argv[])
 {
 	PLIC<1, numberInterrupts, maxPriority> dut("DUT");
-	Simple_interrupt_target sit(dut);
-	//interrupt line plic -> sit
-	dut.target_harts[0] = &sit;
-	//minikernel_step();	//0ms
-
 
 	if(argc == 2)
 	{
