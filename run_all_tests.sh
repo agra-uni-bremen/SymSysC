@@ -2,20 +2,20 @@
 buildfolder="build"
 sourcefolder=$(realpath source)
 tests=(
-    #"sensor#1"
-    #"sensor#2"
-    #"uart"
+    "sensor#1"
+    "sensor#2"
+    "uart"
     "plic#functional_test_basic"
     "plic#functional_test_consider_threshold"
     "plic#functional_test_priority_direct"
     "plic#interface_test_read"
     "plic#interface_test_write"
-    "plic_fault#functional_test_basic"          #Ih, copypasta
+    "plic_fault#functional_test_basic"
     "plic_fault#functional_test_consider_threshold"
     "plic_fault#functional_test_priority_direct"
     "plic_fault#interface_test_read"
     "plic_fault#interface_test_write"
-    "vanilla_plic#functional_test_basic"          #Ih, copypasta
+    "vanilla_plic#functional_test_basic"
     "vanilla_plic#functional_test_consider_threshold"
     "vanilla_plic#functional_test_priority_direct"
     "vanilla_plic#interface_test_read"
@@ -53,12 +53,13 @@ do
 	echo "Running test $base_name ($subtype)"
 	if [[ $base_name == *"vanilla"* ]]; then
         echo "Using vanilla SysC args"
-        args=$klee_vanilla_args
+        args=${klee_vanilla_args[*]}
     else
         echo "Using normal klee args"
-        args=$klee_args
+        args=${klee_args[*]}
     fi
-	{ time klee ${args[*]} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/run.log" 2>&1 &
+	echo "klee ${args} $buildfolder/testbench_$base_name $subtype > $testfolder/run.log"
+	{ time klee ${args} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/run.log" 2>&1 &
 	klee_pid[${i}]=$!
 	sleep 1
 	klee_folder[${i}]=$(readlink -f $buildfolder/klee-last)
