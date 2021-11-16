@@ -34,6 +34,8 @@ klee_args=(
 klee_vanilla_args=(
     "-link-llvm-lib=${sourcefolder}/systemc-dist/lib_llvm/libsystemc.so"
     "--libcxx"
+    "--libc=uclibc"
+    "-posix-runtime" #libsystemc.so needs to be main arg (where the main() is)
     )
 
 echo "Today is $today, writing to $testfolder_base"
