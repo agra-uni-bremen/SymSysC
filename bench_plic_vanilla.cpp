@@ -307,7 +307,6 @@ struct interface_test_write : public sc_core::sc_module {
 	}
 };
 
-
 int sc_main(int argc, char* argv[])
 {
 	PLIC<1, numberInterrupts, maxPriority> dut("DUT");

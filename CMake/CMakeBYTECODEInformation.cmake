@@ -3,10 +3,15 @@
 set(CMAKE_BYTECODE_COMPILER
 	"clang++"
 )
+
 set(CMAKE_BYTECODE_SOURCE_FILE_EXTENSIONS cpp)
 set(CMAKE_BYTECODE_OUTPUT_EXTENSION .bc)
-set(CMAKE_BYTECODE_FLAGS 
-	"-DUSE_KLEE -stdlib=libc++ -std=c++14 -emit-llvm -flto -c -Xclang -disable-O0-optnone" # -I/tmp/klee-uclibc-90/include/"
+if(CMAKE_BYTECODE_COMPILER_TARGET)
+    message("Setting target triplet to ${CMAKE_BYTECODE_COMPILER_TARGET}")
+    set(SET_TARGET_TRIPLET --target=${CMAKE_BYTECODE_COMPILER_TARGET})
+endif()
+set(CMAKE_BYTECODE_FLAGS
+	"-DUSE_KLEE ${SET_TARGET_TRIPLET} -stdlib=libc++ -std=c++14 -emit-llvm -flto -c -Xclang -disable-O0-optnone" # -I/tmp/klee-uclibc-90/include/"
 )
 set(CMAKE_BYTECODE_FLAGS_DEBUG "-g3")
 set(CMAKE_BYTECODE_FLAGS_RELEASE "-O3")
@@ -16,7 +21,7 @@ set(CMAKE_BYTECODE_LINK_FLAGS
 	#"-only-needed"
 )
 SET(CMAKE_BYTECODE_LINK_EXECUTABLE
-	"llvm-link -only-needed <CMAKE_BYTECODE_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> <LINK_LIBRARIES> -o <TARGET>" 
+	"llvm-link -only-needed <CMAKE_BYTECODE_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> <LINK_LIBRARIES> -o <TARGET>"
 )
 set(CMAKE_BYTECODE_ARCHIVE_CREATE "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>")
 set(CMAKE_BYTECODE_ARCHIVE_APPEND "<CMAKE_AR> q <TARGET> <LINK_FLAGS> <OBJECTS>")

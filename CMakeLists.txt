@@ -19,9 +19,10 @@ endif()
 find_package( SystemC REQUIRED)
 
 if(BUILD STREQUAL "bytecode")
-    enable_language(BYTECODE)
     MESSAGE("Building LLVM BYTECODE for Klee")
-    #set(SystemC_LIBRARIES "${SystemC_BYTECODE_LIBRARIES})
+    set(CMAKE_BYTECODE_COMPILER_TARGET x86_64-pc-linux-gnu)	#uclibc is built in this target triple
+    #set(SystemC_LIBRARIES "${SystemC_BYTECODE_LIBRARIES})	# this is done manually (see TODO.md)
+    enable_language(BYTECODE)
 else() #native
     enable_language(CXX)
     MESSAGE("Building native C/C++")
