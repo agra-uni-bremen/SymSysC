@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-set(CMAKE_CXX_COMPILER "clang++")
-set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 # "-fsanitize=memory -fsanitize-memory-track-origins=2 -fno-omit-frame-pointer"
-set(CMAKE_CXX_FLAGS_DEBUG "-fsanitize=address -fno-omit-frame-pointer -g3 -O1")
+set(CMAKE_CXX_FLAGS_DEBUG "-fsanitize=address -fno-omit-frame-pointer -g -O1")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
@@ -17,17 +15,32 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 find_package( SystemC REQUIRED)
+set(UCLIBC_TARGET_TRIPLET x86_64-pc-linux-gnu)	#uclibc is built in this target triple
 
-if(BUILD STREQUAL "bytecode")
+message("Build is set to: ${BUILD}")
+if(BUILD STREQUAL "wllvm")
+    MESSAGE("Building LLVM BYTECODE for Klee with wllvm")
+    enable_language(CXX)
+    set(ENV{LLVM_COMPILER} [clang])		#dunno if this works, just call export LLVM_COMPILER=clang
+    set(CMAKE_CXX_COMPILER "wllvm++")
+    set(CMAKE_C_COMPILER "wllvm")
+    set(CMAKE_C_COMPILER_TARGET ${UCLIBC_TARGET_TRIPLET})
+    set(CMAKE_CXX_COMPILER_TARGET ${UCLIBC_TARGET_TRIPLET})
+    set(SystemC_LIBRARIES ${SystemC_CXX_LIBRARIES})		# as long as it has been built with wllvm...
+    SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,--unresolved-symbols=ignore-in-object-files")	# for klee_int() and konsorten
+elseif(BUILD STREQUAL "bytecode")
     MESSAGE("Building LLVM BYTECODE for Klee")
-    set(CMAKE_BYTECODE_COMPILER_TARGET x86_64-pc-linux-gnu)	#uclibc is built in this target triple
-    #set(SystemC_LIBRARIES "${SystemC_BYTECODE_LIBRARIES})	# this is done manually (see TODO.md)
     enable_language(BYTECODE)
+    set(CMAKE_BYTECODE_COMPILER_TARGET ${UCLIBC_TARGET_TRIPLET})
+    set(SystemC_LIBRARIES /home/klee/source/systemc-dist/lib_llvm/libsystemc.so)
 else() #native
     enable_language(CXX)
     MESSAGE("Building native C/C++")
+    set(CMAKE_CXX_COMPILER "clang++")
+    set(CMAKE_C_COMPILER "clang")
     set(SystemC_LIBRARIES ${SystemC_CXX_LIBRARIES})
 endif()
+message("Using Systemc: ${SystemC_LIBRARIES}")
 
 include_directories(.)  #klee_conf.h
 subdirs(minikernel)
