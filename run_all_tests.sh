@@ -32,10 +32,11 @@ klee_args=(
     #"--emit-all-errors=1"
     )
 klee_vanilla_args=(
-    "-link-llvm-lib=${sourcefolder}/systemc-dist/lib_llvm/libsystemc.so"
+    #"-link-llvm-lib=${sourcefolder}/systemc-dist/lib_llvm/libsystemc.so"
     "--libcxx"
     "--libc=uclibc"
     "-posix-runtime" #libsystemc.so needs to be main arg (where the main() is)
+    "${sourcefolder}/systemc-dist/lib_llvm/libsystemc.so" # this needs to be the last item
     )
 
 echo "Today is $today, writing to $testfolder_base"
@@ -55,13 +56,14 @@ do
 	echo "Running test $base_name ($subtype)"
 	if [[ $base_name == *"vanilla"* ]]; then
         echo "Using vanilla SysC args"
-        args=${klee_vanilla_args[*]}
+	# Here, "main" executable is switched with libsysc.so to run correct main()
+        args="-link-llvm-lib=$buildfolder/testbench_$base_name ${klee_vanilla_args[*]}"
     else
         echo "Using normal klee args"
-        args=${klee_args[*]}
+        args=${klee_args[*]} $buildfolder/testbench_$base_name
     fi
-	echo "klee ${args} $buildfolder/testbench_$base_name $subtype > $testfolder/run.log"
-	{ time klee ${args} $buildfolder/testbench_$base_name $subtype ; } > "$testfolder/run.log" 2>&1 &
+	echo "klee ${args} $subtype > $testfolder/run.log"
+	{ time klee ${args} $subtype ; } > "$testfolder/run.log" 2>&1 &
 	klee_pid[${i}]=$!
 	sleep 1
 	klee_folder[${i}]=$(readlink -f $buildfolder/klee-last)
