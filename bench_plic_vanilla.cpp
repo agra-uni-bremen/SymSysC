@@ -3,6 +3,10 @@
 #include <systemc.h>
 #include <tlm_utils/simple_initiator_socket.h>
 
+#ifndef __UCLIBC__
+    #warning "Not using uclibc...."
+#endif
+
 //todo more flexible?
 static constexpr uint32_t numberInterrupts = 64, maxPriority = 32;
 

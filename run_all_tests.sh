@@ -2,19 +2,19 @@
 buildfolder="build"
 sourcefolder=$(realpath source)
 tests=(
-    "sensor#1"
-    "sensor#2"
-    "uart"
-    "plic#functional_test_basic"
-    "plic#functional_test_consider_threshold"
-    "plic#functional_test_priority_direct"
-    "plic#interface_test_read"
-    "plic#interface_test_write"
-    "plic_fault#functional_test_basic"
-    "plic_fault#functional_test_consider_threshold"
-    "plic_fault#functional_test_priority_direct"
-    "plic_fault#interface_test_read"
-    "plic_fault#interface_test_write"
+#    "sensor#1"
+#    "sensor#2"
+#    "uart"
+#    "plic#functional_test_basic"
+#    "plic#functional_test_consider_threshold"
+#    "plic#functional_test_priority_direct"
+#    "plic#interface_test_read"
+#    "plic#interface_test_write"
+#    "plic_fault#functional_test_basic"
+#    "plic_fault#functional_test_consider_threshold"
+#    "plic_fault#functional_test_priority_direct"
+#    "plic_fault#interface_test_read"
+#    "plic_fault#interface_test_write"
     "vanilla_plic#functional_test_basic"
     "vanilla_plic#functional_test_consider_threshold"
     "vanilla_plic#functional_test_priority_direct"
@@ -54,6 +54,8 @@ do
 	mkdir "$testfolder" 2> /dev/null
 	make -C $buildfolder testbench_$base_name --no-print-directory
 	echo "Running test $base_name ($subtype)"
+	klee_folder[${i}]="$buildfolder/klee_run-$base_name_$subtype"
+	rm -rf klee_folder[${i}]
 	if [[ $base_name == *"vanilla"* ]]; then
         echo "Using vanilla SysC args"
 	# Here, "main" executable is switched with libsysc.so to run correct main()
@@ -62,11 +64,10 @@ do
         echo "Using normal klee args"
         args=${klee_args[*]} $buildfolder/testbench_$base_name
     fi
-	echo "klee ${args} $subtype > $testfolder/run.log"
-	{ time klee ${args} $subtype ; } > "$testfolder/run.log" 2>&1 &
+	echo "klee --output-dir=${klee_folder[${i}]} ${args} $subtype > $testfolder/run.log"
+	{ time klee --output-dir=${klee_folder[${i}]} ${args} $subtype ; } > "$testfolder/run.log" 2>&1 &
 	klee_pid[${i}]=$!
 	sleep 1
-	klee_folder[${i}]=$(readlink -f $buildfolder/klee-last)
 	klee_target_folder[${i}]=$testfolder
 	echo "$base_name ($subtype) running as ${klee_pid[${i}]} into ${klee_folder[${i}]}"
 	i=$[i + 1]
