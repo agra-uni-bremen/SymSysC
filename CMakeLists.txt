@@ -39,6 +39,7 @@ else() #native
     set(CMAKE_CXX_COMPILER "clang++")
     set(CMAKE_C_COMPILER "clang")
     set(SystemC_LIBRARIES ${SystemC_CXX_LIBRARIES})
+    SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,--unresolved-symbols=ignore-in-object-files")	# for klee_int() and konsorten
 endif()
 message("Using Systemc: ${SystemC_LIBRARIES}")
 

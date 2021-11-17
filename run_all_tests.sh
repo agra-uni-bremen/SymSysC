@@ -1,4 +1,8 @@
 #!/bin/bash
+GRN='\033[1;32m'
+BLU='\033[1;34m'
+NORM='\033[0m'
+
 buildfolder="build"
 sourcefolder=$(realpath source)
 tests=(
@@ -46,7 +50,7 @@ do
 	mkdir $testfolder
 	echo "Building testbench_$base_name"
 	make -C $buildfolder testbench_$base_name --no-print-directory
-	echo "Running test $base_name ($subtype)"
+	echo -e "${BLU}Running test $base_name ($subtype)$NORM"
 	klee_target_folder[${i}]="$testfolder"
 	#rm -rf klee_folder[${i}]
         args="${klee_args[*]} $buildfolder/testbench_${base_name}"
@@ -63,7 +67,7 @@ echo "All processes started. Waiting for processes to finish..."
 for ((i=0;i<${#tests[@]};i++)); do
     echo "waiting for PID ${klee_pid[${i}]} (${tests[${i}]})..."
     wait "${klee_pid[${i}]}"
-    echo "${tests[${i}]} finished."
+    echo -e "${GRN}${tests[${i}]} finished.$NORM"
     # copy temporary result folder into outputfolder
     #mv "${klee_folder[${i}]}" "${klee_target_folder[${i}]}"
 done
