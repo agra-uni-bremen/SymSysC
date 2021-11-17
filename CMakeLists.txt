@@ -52,13 +52,13 @@ add_executable(testbench_plic
 )
 target_link_libraries(testbench_plic minikernel bench_translated)
 
-add_executable(testbench_vanilla_plic
-        bench_plic_vanilla.cpp
+add_executable(testbench_sysc_plic
+        bench_plic_sysc.cpp
 )
-target_include_directories(testbench_vanilla_plic PRIVATE ${SystemC_INCLUDE_DIR})
-target_compile_definitions(testbench_vanilla_plic PRIVATE EXTRA_BUGS)
-target_link_libraries(testbench_vanilla_plic ${SystemC_LIBRARIES} bench_vanilla)
-#target_link_libraries(testbench_vanilla_plic ${SystemC_LIBRARIES})
+target_include_directories(testbench_sysc_plic PRIVATE ${SystemC_INCLUDE_DIR})
+target_compile_definitions(testbench_sysc_plic PRIVATE EXTRA_BUGS)
+target_link_libraries(testbench_sysc_plic ${SystemC_LIBRARIES} bench_sysc)
+#target_link_libraries(testbench_sysc_plic ${SystemC_LIBRARIES})
 
 add_executable(testbench_plic_fault
         bench_plic.cpp
@@ -81,7 +81,7 @@ add_executable(testbench_uart
 )
 target_link_libraries(testbench_uart minikernel bench_translated)
 
-set(KLEE_ARGS 
+set(KLEE_ARGS
 	"--libcxx"
 	"--libc=uclibc"
 	"-posix-runtime"
@@ -93,8 +93,8 @@ add_custom_target(run_klee_tests_with_instructions
     DEPENDS testbench_plic
 )
 
-add_custom_target(run_vanilla_bench
-    COMMAND time klee -link-llvm-lib=../source/systemc-dist/lib_llvm/libsystemc.so --libcxx testbench_vanilla_plic
-    DEPENDS testbench_vanilla_plic
+add_custom_target(run_sysc_bench
+    COMMAND time klee --libc=uclibc -posix-runtime -only-output-states-covering-new --libcxx testbench_sysc_plic
+    DEPENDS testbench_sysc_plic
 )
- 
+
