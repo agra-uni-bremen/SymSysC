@@ -15,7 +15,7 @@ build/:
 build/native/Makefile: build/
 	mkdir build/native || true
 	cd build/native && cmake -DBUILD=native ../..
-	
+
 build/bytecode/Makefile: build/
 	mkdir build/bytecode || true
 	cd build/bytecode && cmake -DBUILD=bytecode ../..
@@ -38,7 +38,7 @@ docker-build:
 	echo "if problems occur, execute"
 	echo "sudo mkdir /sys/fs/cgroup/systemd"
 	echo "sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd"
-	$(container_prog) build --tag klee-more:1.0 . 
+	$(container_prog) build --tag klee-more:1.0 .
 
 docker:			#todo: check if docker image exists
 	$(container_prog) run -ti --ulimit='stack=-1:-1' -v $(shell pwd):/home/klee/source:Z klee-more:1.0

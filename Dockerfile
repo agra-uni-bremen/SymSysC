@@ -9,3 +9,4 @@ RUN cd cmake-3.18.2 && ./bootstrap && make -j$(nproc) && sudo make install
 RUN sudo ln -s /home/klee/klee_src/include/ /include	# This is for shitty clang include problem not honoring LIBRARY_PATH
 RUN mkdir build build_native && echo "cd build && cmake -DBUILD=bytecode ../source && make -j$(nproc) && cd ../build_native && cmake ../source && make -j$(nproc)" > make.sh && chmod +x make.sh
 RUN rm cmake-3.18.2.tar.gz
+RUN pip install wllvm
