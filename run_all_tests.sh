@@ -15,11 +15,11 @@ tests=(
 #    "plic_fault#functional_test_priority_direct"
 #    "plic_fault#interface_test_read"
 #    "plic_fault#interface_test_write"
-    "vanilla_plic#functional_test_basic"
-    "vanilla_plic#functional_test_consider_threshold"
-    "vanilla_plic#functional_test_priority_direct"
-    "vanilla_plic#interface_test_read"
-    "vanilla_plic#interface_test_write"
+    "sysc_plic#functional_test_basic"
+    "sysc_plic#functional_test_consider_threshold"
+    "sysc_plic#functional_test_priority_direct"
+    "sysc_plic#interface_test_read"
+    "sysc_plic#interface_test_write"
     )
 today=$(date +"%Y-%m-%d-%H.%M")
 testfolder_base=test/$today
@@ -30,13 +30,6 @@ klee_args=(
     "-only-output-states-covering-new"
     #"-max-memory=40000"	#default: 2000 -> 2GB
     #"--emit-all-errors=1"
-    )
-klee_vanilla_args=(
-    #"-link-llvm-lib=${sourcefolder}/systemc-dist/lib_llvm/libsystemc.so"
-    "--libcxx"
-    "--libc=uclibc"
-    "-posix-runtime" #libsystemc.so needs to be main arg (where the main() is)
-    "${sourcefolder}/systemc-dist/lib_llvm/libsystemc.so" # this needs to be the last item
     )
 
 echo "Today is $today, writing to $testfolder_base"
@@ -50,25 +43,17 @@ do
 	base_name=$(echo $test | cut -d "#" -f1)
 	subtype=$(echo $test | cut -d "#" -s -f2)
 	testfolder=$testfolder_base/$test
+	mkdir $testfolder
 	echo "Building testbench_$base_name"
-	mkdir "$testfolder" 2> /dev/null
 	make -C $buildfolder testbench_$base_name --no-print-directory
 	echo "Running test $base_name ($subtype)"
-	klee_folder[${i}]="$buildfolder/klee_run-$base_name_$subtype"
-	rm -rf klee_folder[${i}]
-	if [[ $base_name == *"vanilla"* ]]; then
-        echo "Using vanilla SysC args"
-	# Here, "main" executable is switched with libsysc.so to run correct main()
-        args="-link-llvm-lib=$buildfolder/testbench_$base_name ${klee_vanilla_args[*]}"
-    else
-        echo "Using normal klee args"
-        args=${klee_args[*]} $buildfolder/testbench_$base_name
-    fi
-	echo "klee --output-dir=${klee_folder[${i}]} ${args} $subtype > $testfolder/run.log"
-	{ time klee --output-dir=${klee_folder[${i}]} ${args} $subtype ; } > "$testfolder/run.log" 2>&1 &
+	klee_target_folder[${i}]="$testfolder"
+	#rm -rf klee_folder[${i}]
+        args="${klee_args[*]} $buildfolder/testbench_${base_name}"
+	echo "klee --output-dir=${klee_target_folder[${i}]}/klee-run ${args} $subtype > $testfolder/run.log"
+	{ time klee --output-dir=${klee_target_folder[${i}]}/klee-run ${args} $subtype ; } > "$testfolder/run.log" 2>&1 &
 	klee_pid[${i}]=$!
 	sleep 1
-	klee_target_folder[${i}]=$testfolder
 	echo "$base_name ($subtype) running as ${klee_pid[${i}]} into ${klee_folder[${i}]}"
 	i=$[i + 1]
 done
@@ -79,7 +64,8 @@ for ((i=0;i<${#tests[@]};i++)); do
     echo "waiting for PID ${klee_pid[${i}]} (${tests[${i}]})..."
     wait "${klee_pid[${i}]}"
     echo "${tests[${i}]} finished."
-    mv "${klee_folder[${i}]}" "${klee_target_folder[${i}]}"
+    # copy temporary result folder into outputfolder
+    #mv "${klee_folder[${i}]}" "${klee_target_folder[${i}]}"
 done
 
 end_stats=$testfolder_base/klee-stat.log
@@ -91,7 +77,7 @@ for ((i=0;i<${#tests[@]};i++)); do
     echo >> "$end_stats"
     echo "${klee_target_folder[${i}]}/run.log found errors: " >> "$end_stats"
     cat "${klee_target_folder[${i}]}/run.log" | grep ERROR >> "$end_stats"
-    tail -n 4 "${klee_target_folder[${i}]}/run.log" >> "$end_stats"
+    tail -n 8 "${klee_target_folder[${i}]}/run.log" >> "$end_stats"
 done
 
 cat $testfolder_base/klee-stat.log
