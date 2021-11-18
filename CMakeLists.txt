@@ -20,7 +20,6 @@ set(UCLIBC_TARGET_TRIPLET x86_64-pc-linux-gnu)	#uclibc is built in this target t
 message("Build is set to: ${BUILD}")
 if(BUILD STREQUAL "wllvm")
     MESSAGE("Building LLVM BYTECODE for Klee with wllvm")
-    enable_language(CXX)
     set(ENV{LLVM_COMPILER} [clang])		#dunno if this works, just call export LLVM_COMPILER=clang
     set(CMAKE_CXX_COMPILER "wllvm++")
     set(CMAKE_C_COMPILER "wllvm")
@@ -28,11 +27,12 @@ if(BUILD STREQUAL "wllvm")
     set(CMAKE_CXX_COMPILER_TARGET ${UCLIBC_TARGET_TRIPLET})
     set(SystemC_LIBRARIES ${SystemC_CXX_LIBRARIES})		# as long as it has been built with wllvm...
     SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,--unresolved-symbols=ignore-in-object-files")	# for klee_int() and konsorten
+    enable_language(CXX)
 elseif(BUILD STREQUAL "bytecode")
     MESSAGE("Building LLVM BYTECODE for Klee")
-    enable_language(BYTECODE)
     set(CMAKE_BYTECODE_COMPILER_TARGET ${UCLIBC_TARGET_TRIPLET})
     set(SystemC_LIBRARIES /home/klee/source/systemc-dist/lib_llvm/libsystemc.so)
+    enable_language(BYTECODE)
 else() #native
     enable_language(CXX)
     MESSAGE("Building native C/C++")
