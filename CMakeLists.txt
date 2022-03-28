@@ -95,7 +95,6 @@ add_custom_target(run_klee_tests_with_instructions
 )
 
 add_custom_target(run_sysc_bench
-    COMMAND time klee --libc=uclibc -posix-runtime -only-output-states-covering-new --libcxx testbench_sysc_plic
+    COMMAND time klee --libc=uclibc -posix-runtime -only-output-states-covering-new --libcxx testbench_sysc_plic interface_test_write
     DEPENDS testbench_sysc_plic
 )
-
