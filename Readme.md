@@ -1,48 +1,21 @@
-Performance testing on side
-	- compare C/C++
+Symbolic Execution of SystemC TLM Peripherals
+=============================================
 
-Think of concrete testbenches
-	- priority vs order of interrupts
-	- If interrupt is done, sometime (in timeout) it should be triggered
+This is a Mini-Kernel, designed to replace (parts of) the SystemC TLM kernel and optimized for symbolic execution frameworks,
+especially like [klee](https://klee.github.io/).
+It is the experimental proof-of-concept of a paper yet to be published.
 
-(nice to have: standard assertions (no crash, memory leak, ..))
+How to test:
+------------
+Start docker container: `make docker-build docker`
+and run tests:
+```bash
+$ ./make.sh # optional
+$ ./source/run_all_tests.sh
+```
 
-Hashmap ersetzen durch normale map
-UART, Sensor2 mit register range
-
-klee/angr comparison?
-	Kosten / Nutzen?
-
-Hierachical waits in called functions?
-
-Systemc basierte Metriken, automatisch herausfinden?
-    Coverage?
-
-Laufzeit messen, Sinvolle Tests schreiben.
-    Eigenschaften definieren und dagegen testen (Beispieleigenschaften aus 2016 Datepaper)
-    
-
-PLIC Ausführungsgeschwindigkeit wo Probleme?
-
-Erste Erkenntnis: Boost und Fremdlibs verzögern _extrem_ die Ausführung.
-
-Getrennte Tabellen für jede Testbench.
-    -> Fehlergruppen for jede TB
-        -> Robustness (interface)
-        -> Memory-Fehler
-        -> Off-by-one
-        -> Whitebox: Erwartete Werte
-            -> Prio richtig?
-            -> Interrupt auch claim-bar?
-
-
-Error handling (generic values as input, watch behaviour),
-Functional testing
-Fault injection vs Correctness, how?
-
-
-Howto Build LLVM-Sysc:
-
+How to Build LLVM-SystemC:
+--------------------------
 ```bash
 https://www.accellera.org/images/downloads/standards/systemc/systemc-2.3.3.tar.gz
 tar xf systemc-2.3.3.tar.gz && cd systemc-2.3.3
@@ -57,14 +30,11 @@ cp -P src/libsystemc* /home/klee/source/systemc-dist/lib_llvm/
 klee --libcxx --libc=uclibc -posix-runtime -only-output-states-covering-new build/testbench_sysc_plic interface_test_write
 ```
 
-Note: Sadly, the build commands for checked-in systemc got lodst. :*
 
-
-something something wllvm:
+There is also the possibility of building this with [wllvm](https://github.com/travitch/whole-program-llvm):
 ```bash
 export LLVM_COMPILER=clang
 ./configure CC=wllvm CXX=wllvm++ --prefix="$(pwd)/../systemc-dist"
 # not working: ./configure CC=wllvm CXX=wllvm++ --prefix="$(pwd)/../systemc-dist" CXXFLAGS="--target=x86_64-pc-linux-gnu" CFLAGS="--target=x86_64-pc-linux-gnu"
 make -j20 && make install
-
 ```
