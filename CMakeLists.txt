@@ -31,7 +31,7 @@ if(BUILD STREQUAL "wllvm")
 elseif(BUILD STREQUAL "bytecode")
     MESSAGE("Building LLVM BYTECODE for Klee")
     set(CMAKE_BYTECODE_COMPILER_TARGET ${UCLIBC_TARGET_TRIPLET})
-    set(SystemC_LIBRARIES /home/klee/source/systemc-dist/lib_llvm/libsystemc.so)
+    set(SystemC_LIBRARIES /home/klee/source/systemc-dist/lib_llvm/libsystemc.so.2.3.3.bc)
     enable_language(BYTECODE)
 else() #native
     enable_language(CXX)
