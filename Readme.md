@@ -3,7 +3,7 @@ Symbolic Execution of SystemC TLM Peripherals
 
 This is a Mini-Kernel, designed to replace (parts of) the SystemC TLM kernel and optimized for symbolic execution frameworks,
 especially like [klee](https://klee.github.io/).
-It is the experimental proof-of-concept of a paper yet to be published.
+It is the experimental proof-of-concept of a paper to be published at the DAC2022.
 
 How to test:
 ------------
