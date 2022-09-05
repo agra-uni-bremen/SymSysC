@@ -5,7 +5,7 @@ find_program(
         HINTS "${CMAKE_SOURCE_DIR}"
         DOC "LLVM Bytecode compiler" 
 )
-mark_as_advanced(CMAKE_FOO_COMPILER)
+mark_as_advanced(CMAKE_BYTECODE_COMPILER)
 
 set(CMAKE_BYTECODE_COMPILER_ENV_VAR "clang++")
 

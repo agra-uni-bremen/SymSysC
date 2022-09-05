@@ -1,8 +1,8 @@
 # This file sets the basic flags for the BYTECODE compiler
 
-set(CMAKE_BYTECODE_COMPILER
-	"clang++"
-)
+message("Bytecode-Generator active.")
+
+set(CMAKE_BYTECODE_COMPILER "clang++")
 
 set(CMAKE_BYTECODE_SOURCE_FILE_EXTENSIONS cpp)
 set(CMAKE_BYTECODE_OUTPUT_EXTENSION .bc)
@@ -11,12 +11,15 @@ if(CMAKE_BYTECODE_COMPILER_TARGET)
     set(SET_TARGET_TRIPLET --target=${CMAKE_BYTECODE_COMPILER_TARGET})
 endif()
 set(CMAKE_BYTECODE_FLAGS
-	"-DUSE_KLEE ${SET_TARGET_TRIPLET} -stdlib=libc++ -std=c++14 -emit-llvm -flto -c -Xclang -disable-O0-optnone" # -I/tmp/klee-uclibc-90/include/"
+	"-DUSE_KLEE ${SET_TARGET_TRIPLET} -std=c++17 -emit-llvm -flto -c -Xclang -disable-O0-optnone"
+	# -stdlib=libc++
+	# -I/tmp/klee-uclibc-90/include/"
 )
 set(CMAKE_BYTECODE_FLAGS_DEBUG "-g3")
 set(CMAKE_BYTECODE_FLAGS_RELEASE "-O3")
 set(CMAKE_INCLUDE_FLAG_BYTECODE "-I ")
 set(CMAKE_BYTECODE_LINK_FLAGS
+	#"-stdlib=libc++"
 	#"-fuse-ld=lld"
 	#"-only-needed"
 )
