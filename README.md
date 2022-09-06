@@ -2,3 +2,10 @@ REQUIREMENTS
 ------------
 
 clang, llvm-link, libc++ (get by installing g++)
+
+
+If klee not available, build it yourself (warn: Will take some time)
+
+```
+BASE="$HOME/shitgit" MINISAT_VERSION="master" STP_VERSION="2.3.3" SOLVERS="stp" COVERAGE=0 USE_TCMALLOC=1 LLVM_VERSION=14 ENABLE_OPTIMIZED=1 ENABLE_DEBUG=1 DISABLE_ASSERTIONS=0 REQUIRES_RTTI=0 SOLVERS=STP:Z3 GTEST_VERSION=1.11.0 UCLIBC_VERSION=klee_uclibc_v1.2 TCMALLOC_VERSION=2.7 SANITIZER_BUILD= STP_VERSION=2.3.3 MINISAT_VERSION=master Z3_VERSION=4.8.14 USE_LIBCXX=1 KLEE_RUNTIME_BUILD="Debug+Asserts" ENABLE_DOXYGEN=0 ./scripts/build/build.sh klee
+```
