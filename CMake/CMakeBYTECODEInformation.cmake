@@ -11,8 +11,7 @@ if(CMAKE_BYTECODE_COMPILER_TARGET)
     set(SET_TARGET_TRIPLET --target=${CMAKE_BYTECODE_COMPILER_TARGET})
 endif()
 set(CMAKE_BYTECODE_FLAGS
-	"-DUSE_KLEE ${SET_TARGET_TRIPLET} -std=c++17 -emit-llvm -flto -c -Xclang -disable-O0-optnone"
-	# -stdlib=libc++
+	"-DUSE_KLEE ${SET_TARGET_TRIPLET} -std=c++17 -stdlib=libc++ -emit-llvm -flto -c -Xclang -disable-O0-optnone"
 	# -I/tmp/klee-uclibc-90/include/"
 )
 set(CMAKE_BYTECODE_FLAGS_DEBUG "-g3")
