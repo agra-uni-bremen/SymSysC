@@ -37,6 +37,6 @@ klee --libcxx --libc=uclibc -posix-runtime -only-output-states-covering-new buil
 There is also the possibility of building this with [wllvm](https://github.com/travitch/whole-program-llvm):
 ```bash
 export LLVM_COMPILER=clang
-../configure CC=wllvm CXX=wllvm++ --prefix="$(pwd)/../systemc-dist" --build=x86_64-pc-linux-gnu --enable-debug  CXXFLAGS='-std=c++17' --with-arch-suffix=-wllvm
+../configure CC=wllvm CXX=wllvm++ --prefix="$(pwd)/../systemc-dist" --build=x86_64-pc-linux-gnu --enable-debug  CXXFLAGS='-std=c++17' --with-arch-suffix=-wllvm #--enable-shared=NO --enable-static=YES
 make -j20 && make install
 ```

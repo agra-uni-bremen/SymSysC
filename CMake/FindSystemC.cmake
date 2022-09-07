@@ -1,6 +1,9 @@
 set(SystemC_DIR "${CMAKE_CURRENT_LIST_DIR}/../systemc-dist")
 
+
 set(SystemC_INCLUDE_DIRS ${SystemC_DIR}/include )
 set(SystemC_INCLUDE_DIR  ${SystemC_INCLUDE_DIRS} )
 set(SystemC_CXX_LIBRARIES ${SystemC_DIR}/lib-native/libsystemc.a )
-set(SystemC_BYTECODE_LIBRARIES ${SystemC_DIR}/lib-llvm/libsystemc.so.bc ) # see build_sysc_all.sh. It is important that it ends with bc.
+
+set(SystemC_llvm_BYTECODE_LIBRARIES ${SystemC_DIR}/lib-llvm/libsystemc.so.bc ) # see build_sysc_all.sh. It is important that it ends with bc.
+set(SystemC_wllvm_BYTECODE_LIBRARIES ${SystemC_DIR}/lib-wllvm/libsystemc.a.bc )
