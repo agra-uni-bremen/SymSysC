@@ -18,9 +18,9 @@ set(CMAKE_BYTECODE_FLAGS_DEBUG "-g3")
 set(CMAKE_BYTECODE_FLAGS_RELEASE "-O3")
 set(CMAKE_INCLUDE_FLAG_BYTECODE "-I ")
 set(CMAKE_BYTECODE_LINK_FLAGS
-	#"-stdlib=libc++"
-	#"-fuse-ld=lld"
+	#"-v"
 	#"-only-needed"
+	#"-fuse-ld=lld"
 )
 SET(CMAKE_BYTECODE_LINK_EXECUTABLE
 	"llvm-link <CMAKE_BYTECODE_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> <LINK_LIBRARIES> -o <TARGET>"

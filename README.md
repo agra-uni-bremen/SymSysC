@@ -1,3 +1,9 @@
+Symbolic Execution of SystemC TLM Peripherals
+=============================================
+
+This is the "library" that only contains the minikernel and the required build-system for SystemC in LLVM Bitcode.
+For some experiments/examples, see [symsysc-experiments](https://github.com/agra-uni-bremen/symsysc-experiments)
+
 REQUIREMENTS
 ------------
 
