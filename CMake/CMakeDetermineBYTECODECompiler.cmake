@@ -1,6 +1,6 @@
 # Find the compiler
 find_program(
-    CMAKE_BYTECODE_COMPILER 
+    CMAKE_BYTECODE_COMPILER REQUIRED
         NAMES "clang++" 
         HINTS "${CMAKE_SOURCE_DIR}"
         DOC "LLVM Bytecode compiler" 

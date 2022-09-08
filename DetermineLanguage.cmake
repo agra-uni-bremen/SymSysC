@@ -5,7 +5,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMake")
 
 find_package( SystemC REQUIRED)
 set(UCLIBC_TARGET_TRIPLET x86_64-pc-linux-gnu)	#uclibc is usually built in this target triple
-find_program(CLANG "clang" REQUIRED)
 
 message("Build is set to: ${BUILD}")
 if(BUILD STREQUAL "wllvm")
@@ -27,7 +26,6 @@ elseif(BUILD STREQUAL "bytecode")
     set(CMAKE_BYTECODE_COMPILER_TARGET ${UCLIBC_TARGET_TRIPLET})
     set(SystemC_LIBRARIES ${SystemC_llvm_BYTECODE_LIBRARIES})
     enable_language(BYTECODE)
-
 else() #native
     enable_language(CXX)
     MESSAGE("Building native C/C++")

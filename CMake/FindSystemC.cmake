@@ -1,5 +1,6 @@
-set(SystemC_DIR "${CMAKE_CURRENT_LIST_DIR}/../systemc-dist")
-
+if (NOT DEFINED SystemC_DIR)
+	set(SystemC_DIR "${CMAKE_CURRENT_LIST_DIR}/../systemc-dist")
+endif()
 
 set(SystemC_INCLUDE_DIRS ${SystemC_DIR}/include )
 set(SystemC_INCLUDE_DIR  ${SystemC_INCLUDE_DIRS} )

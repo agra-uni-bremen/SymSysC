@@ -4,7 +4,7 @@ set -e # exit on error
 
 DIR="$(pwd)"
 
-PREFIX=$DIR/systemc-dist
+PREFIX="$DIR/systemc-dist"
 
 version=2.3.3
 source=systemc-$version.tar.gz
@@ -21,8 +21,9 @@ cd $SOURCEFOLDER
 
 echo "first, build the normal systemc (also for include files)"
 mkdir -p native-build && cd native-build
-../configure --quiet CXX=clang CXXFLAGS='-std=c++17 -stdlib=libc++' --prefix=$PREFIX --with-arch-suffix=-native
-make --no-print-directory -j$(nproc) install
+../configure --quiet CC=clang CCFLAGS="" CXX=clang++ CXXFLAGS="-std=c++17 -stdlib=libc++" --prefix=$PREFIX --with-arch-suffix=-native
+make --no-print-directory -j$(nproc)
+make -s install
 
 cd $SOURCEFOLDER
 # now building bytecode
@@ -30,7 +31,6 @@ LIBNAME=llvm
 echo "Now building bytecode manually ($LIBNAME)"
 mkdir -p $LIBNAME-build && cd $LIBNAME-build
 # not that important what is set here, as we overwrite it anyways in cmake command
-COMPILER_OVERWRITE_ARGS=
 ../configure --quiet --target=x86_64-pc-linux-gnu CC=clang CFLAGS='' CXX=clang++ CXXFLAGS='-std=c++17' --prefix=$PREFIX --with-arch-suffix=-$LIBNAME
 cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -D CMAKE_CXX_FLAGS="-DUSE_KLEE -fcxx-exceptions -stdlib=libc++ -std=c++17 -emit-llvm -flto -c -Xclang -disable-O0-optnone" -D CMAKE_CXX_CREATE_STATIC_LIBRARY="llvm-link <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>" -D CMAKE_CXX_LINK_EXECUTABLE="llvm-link <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> <LINK_LIBRARIES> -o <TARGET>" -DCMAKE_LINKER=llvm-link -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$PREFIX -DINSTALL_TO_LIB_TARGET_ARCH_DIR=$LIBNAME ..
 echo "Building in first pass, to let the C-Checks pass"
@@ -60,7 +60,8 @@ LIBNAME=wllvm
 INSTALLDIR=$PREFIX/lib-$LIBNAME
 
 mkdir -p $LIBNAME-build && cd $LIBNAME-build
-LLVM_COMPILER=clang ../configure --quiet CC=wllvm CXX=wllvm++ --prefix="$(pwd)/../../systemc-dist" --build=x86_64-pc-linux-gnu --enable-debug  CXXFLAGS='-std=c++17' --with-arch-suffix=-wllvm #--enable-shared=NO --enable-static=YES
+export LLVM_COMPILER=clang
+../configure --quiet CC=wllvm CXX=wllvm++ --prefix="$PREFIX" --build=x86_64-pc-linux-gnu --enable-debug  CXXFLAGS='-std=c++17' --with-arch-suffix=-wllvm #--enable-shared=NO --enable-static=YES
 make --no-print-directory install
 
 cd $INSTALLDIR
