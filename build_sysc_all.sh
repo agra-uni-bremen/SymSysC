@@ -2,7 +2,12 @@
 
 set -e # exit on error
 
-DIR="$(pwd)"
+
+DIR=$1
+if ! [[ -d $DIR ]]; then
+    DIR="$(pwd)"
+fi
+echo "Setting working directory to $DIR"
 
 PREFIX="$DIR/systemc-dist"
 
@@ -62,7 +67,7 @@ INSTALLDIR=$PREFIX/lib-$LIBNAME
 mkdir -p $LIBNAME-build && cd $LIBNAME-build
 export LLVM_COMPILER=clang
 ../configure --quiet CC=wllvm CXX=wllvm++ --prefix="$PREFIX" --build=x86_64-pc-linux-gnu --enable-debug  CXXFLAGS='-std=c++17' --with-arch-suffix=-wllvm #--enable-shared=NO --enable-static=YES
-make --no-print-directory install
+make -j$(nproc) --no-print-directory install
 
 cd $INSTALLDIR
 extract-bc libsystemc.a

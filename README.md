@@ -7,7 +7,7 @@ For some experiments/examples, see [symsysc-experiments](https://github.com/agra
 REQUIREMENTS
 ------------
 
-clang, llvm-link, libc++ (get by installing g++) or libcxx-devel.
+clang, llvm-link, libc++ (get by installing g++) or libcxx-devel, also libc++abi-dev.
 Optional, but nice: wllvm (`pip install wllvm`)
 
 
